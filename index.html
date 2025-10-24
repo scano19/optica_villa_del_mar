@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Prueba virtual de gafas de sol - Óptica Villa del Mar Lekeitio">
+    <meta name="keywords" content="gafas de sol, óptica, Lekeitio, Ray-Ban, Hawkers, prueba virtual">
+    <title>Prueba Virtual de Gafas - Óptica Villa del Mar</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👓 Prueba Virtual de Gafas</h1>
+            <p>Descubre tu estilo perfecto - Óptica Villa del Mar</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Sección de preview -->
+            <div class="preview-section">
+                <div class="model-viewer">
+                    <img id="modelImage" class="model-image" 
+                         src="https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=600&q=80" 
+                         alt="Modelo con gafas Ray-Ban Wayfarer">
+                </div>
+
+                <div class="product-info">
+                    <h2 class="product-title" id="productName">Ray-Ban Wayfarer Classic</h2>
+                    <div class="product-price" id="productPrice">155€</div>
+                    
+                    <p class="product-description" id="productDesc">
+                        Las icónicas Wayfarer de Ray-Ban. Un clásico atemporal que nunca pasa de moda.
+                        Perfectas para cualquier ocasión, desde la playa hasta la ciudad.
+                    </p>
+
+                    <ul class="features" id="productFeatures">
+                        <li>Protección UV400 certificada</li>
+                        <li>Lentes polarizadas</li>
+                        <li>Montura de acetato italiano</li>
+                        <li>Incluye funda rígida original</li>
+                        <li>Garantía 2 años</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Selector de gafas -->
+            <h2 style="text-align: center; color: #333; margin-bottom: 30px;">
+                Elige tu modelo favorito
+            </h2>
+
+            <div class="glasses-selector">
+                <div class="glass-card active" onclick="selectGlasses('wayfarer')">
+                    <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=200&q=80" alt="Ray-Ban Wayfarer">
+                    <h3>Ray-Ban Wayfarer</h3>
+                    <div class="price">155€</div>
+                </div>
+
+                <div class="glass-card" onclick="selectGlasses('hawkers')">
+                    <img src="https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=200&q=80" alt="Hawkers Carbono">
+                    <h3>Hawkers Carbono</h3>
+                    <div class="price">35€</div>
+                </div>
+
+                <div class="glass-card" onclick="selectGlasses('clubmaster')">
+                    <img src="https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=200&q=80" alt="Ray-Ban Clubmaster">
+                    <h3>Ray-Ban Clubmaster</h3>
+                    <div class="price">165€</div>
+                </div>
+
+                <div class="glass-card" onclick="selectGlasses('aviator')">
+                    <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?w=200&q=80" alt="Ray-Ban Aviator">
+                    <h3>Ray-Ban Aviator</h3>
+                    <div class="price">165€</div>
+                </div>
+            </div>
+
+            <!-- Sección de subida de foto -->
+            <div class="upload-section">
+                <h3>📸 ¿Quieres verte con estas gafas?</h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Sube una foto tuya y te mostraremos cómo quedan
+                </p>
+                
+                <div class="upload-box" onclick="document.getElementById('photoUpload').click()">
+                    <input type="file" id="photoUpload" accept="image/*" onchange="handlePhotoUpload(event)">
+                    <div style="font-size: 3em; margin-bottom: 10px;">📤</div>
+                    <p style="color: #0066CC; font-weight: bold;">
+                        Haz clic para subir tu foto
+                    </p>
+                    <p style="color: #999; font-size: 0.9em; margin-top: 10px;">
+                        O arrastra y suelta aquí
+                    </p>
+                </div>
+
+                <div class="loader" id="loader"></div>
+                
+                <div id="uploadedPreview" style="display: none; margin-top: 20px;">
+                    <p style="color: #28a745; font-weight: bold;">✓ Foto cargada correctamente</p>
+                    <p style="color: #666; font-size: 0.9em;">En la versión completa, superpondríamos las gafas automáticamente</p>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="buyNow()">
+                    💳 Comprar ahora
+                </button>
+                <button class="btn btn-secondary" onclick="contactWhatsApp()">
+                    💬 Consultar por WhatsApp
+                </button>
+                <button class="btn btn-secondary" onclick="bookAppointment()">
+                    📅 Reservar cita para probar
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p style="font-weight: bold; color: #333; margin-bottom: 10px;">
+                Óptica Villa del Mar - Tu vista, nuestra pasión desde 1978
+            </p>
+            <div class="footer-info">
+                <div>📍 Calle Mayor, 45 - Lekeitio</div>
+                <div>📞 942 84 20 15</div>
+                <div>💬 688 92 34 56</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
