@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Virtual AR - Óptica Villa del Mar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0066CC, #0052a3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            height: 480px;
+            margin: 0 auto 30px;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        #webcam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            margin: 10px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066CC, #0052a3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,102,204,0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #0066CC;
+            border: 2px solid #0066CC;
+        }
+
+        .btn-secondary:hover {
+            background: #0066CC;
+            color: white;
+        }
+
+        .glasses-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .glass-option {
+            padding: 12px 25px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .glass-option:hover {
+            border-color: #0066CC;
+            transform: translateY(-2px);
+        }
+
+        .glass-option.active {
+            border-color: #0066CC;
+            background: #e6f2ff;
+            font-weight: bold;
+        }
+
+        .status {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-size: 1.1em;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 2;
+            color: #666;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin: 20px 0;
+            color: #0066CC;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .camera-container {
+                height: 360px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎥 Prueba Virtual con Realidad Aumentada</h1>
+            <p>Pruébate las gafas en tiempo real con tu cámara</p>
+        </div>
+
+        <div class="main-content">
+            <a href="index.html" class="back-link">← Volver al catálogo</a>
+
+            <div class="status loading" id="status">
+                🔄 Iniciando cámara y sistema de realidad aumentada...
+            </div>
+
+            <div class="camera-container" id="cameraContainer" style="display: none;">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas id="overlay" class="overlay-canvas"></canvas>
+            </div>
+
+            <div class="controls" id="controls" style="display: none;">
+                <button class="btn btn-primary" id="startBtn">🎥 Activar Cámara</button>
+                <button class="btn btn-secondary" id="captureBtn" style="display: none;">📸 Capturar Foto</button>
+            </div>
+
+            <div class="glasses-selector" id="glassesSelector" style="display: none;">
+                <div class="glass-option active" data-model="wayfarer">Ray-Ban Wayfarer</div>
+                <div class="glass-option" data-model="hawkers">Hawkers Carbono</div>
+                <div class="glass-option" data-model="clubmaster">Ray-Ban Clubmaster</div>
+                <div class="glass-option" data-model="aviator">Ray-Ban Aviator</div>
+            </div>
+
+            <div class="instructions">
+                <h3>📋 Instrucciones:</h3>
+                <ol>
+                    <li>Haz clic en "Activar Cámara" y permite el acceso</li>
+                    <li>Colócate frente a la cámara con buena iluminación</li>
+                    <li>Selecciona el modelo de gafas que quieres probar</li>
+                    <li>Las gafas se superpondrán automáticamente en tu rostro</li>
+                    <li>Mueve la cabeza para ver cómo se ven desde diferentes ángulos</li>
+                </ol>
+                <p style="margin-top: 15px; color: #999; font-size: 0.9em;">
+                    ⚠️ Actualmente utilizamos detección facial básica. Para la versión con SDK completo de Banuba (realidad aumentada profesional), necesitarías configurar tu API key.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TensorFlow.js para detección facial -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+
+    <script>
+        let video, canvas, ctx;
+        let model;
+        let currentGlasses = 'wayfarer';
+        let stream;
+
+        // Configuración inicial
+        document.getElementById('startBtn').addEventListener('click', initCamera);
+
+        async function initCamera() {
+            const statusDiv = document.getElementById('status');
+            const cameraContainer = document.getElementById('cameraContainer');
+            const controls = document.getElementById('controls');
+            const glassesSelector = document.getElementById('glassesSelector');
+
+            try {
+                statusDiv.className = 'status loading';
+                statusDiv.textContent = '🔄 Accediendo a la cámara...';
+
+                // Solicitar acceso a la cámara
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                });
+
+                video = document.getElementById('webcam');
+                canvas = document.getElementById('overlay');
+                ctx = canvas.getContext('2d');
+
+                video.srcObject = stream;
+                
+                // Esperar a que el video esté listo
+                await new Promise(resolve => {
+                    video.onloadedmetadata = () => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        resolve();
+                    };
+                });
+
+                statusDiv.className = 'status loading';
+                statusDiv.textContent = '🔄 Cargando modelo de detección facial...';
+
+                // Cargar modelo de detección facial
+                model = await faceLandmarksDetection.load(
+                    faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
+                );
+
+                statusDiv.className = 'status ready';
+                statusDiv.textContent = '✓ ¡Todo listo! Pruébate diferentes modelos de gafas';
+
+                cameraContainer.style.display = 'block';
+                controls.querySelector('#startBtn').style.display = 'none';
+                controls.querySelector('#captureBtn').style.display = 'inline-block';
+                glassesSelector.style.display = 'flex';
+
+                // Iniciar detección
+                detectFace();
+
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ Error: No se pudo acceder a la cámara. Por favor, permite el acceso e intenta de nuevo.';
+            }
+        }
+
+        async function detectFace() {
+            if (!model || !video) return;
+
+            const predictions = await model.estimateFaces({
+                input: video,
+                returnTensors: false,
+                flipHorizontal: false,
+                predictIrises: false
+            });
+
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (predictions.length > 0) {
+                const keypoints = predictions[0].scaledMesh;
+                
+                // Dibujar las gafas (simplificado)
+                drawGlasses(keypoints);
+            }
+
+            requestAnimationFrame(detectFace);
+        }
+
+        function drawGlasses(keypoints) {
+            // Puntos clave: ojos y puente de la nariz
+            const leftEye = keypoints[33];  // Ojo izquierdo
+            const rightEye = keypoints[263]; // Ojo derecho
+            const nose = keypoints[1];       // Puente de la nariz
+
+            // Calcular dimensiones de las gafas
+            const eyeDistance = Math.sqrt(
+                Math.pow(rightEye[0] - leftEye[0], 2) + 
+                Math.pow(rightEye[1] - leftEye[1], 2)
+            );
+
+            const glassesWidth = eyeDistance * 2.5;
+            const glassesHeight = eyeDistance * 0.8;
+
+            // Dibujar marco de gafas (simplificado)
+            ctx.strokeStyle = getGlassesColor(currentGlasses);
+            ctx.lineWidth = 3;
+            ctx.fillStyle = 'rgba(100, 100, 100, 0.2)';
+
+            // Lente izquierda
+            ctx.beginPath();
+            ctx.ellipse(
+                leftEye[0], 
+                leftEye[1], 
+                eyeDistance * 0.6, 
+                eyeDistance * 0.5, 
+                0, 0, 2 * Math.PI
+            );
+            ctx.stroke();
+            ctx.fill();
+
+            // Lente derecha
+            ctx.beginPath();
+            ctx.ellipse(
+                rightEye[0], 
+                rightEye[1], 
+                eyeDistance * 0.6, 
+                eyeDistance * 0.5, 
+                0, 0, 2 * Math.PI
+            );
+            ctx.stroke();
+            ctx.fill();
+
+            // Puente
+            ctx.beginPath();
+            ctx.moveTo(leftEye[0] + eyeDistance * 0.3, leftEye[1]);
+            ctx.lineTo(rightEye[0] - eyeDistance * 0.3, rightEye[1]);
+            ctx.stroke();
+
+            // Patillas
+            ctx.beginPath();
+            ctx.moveTo(leftEye[0] - eyeDistance * 0.6, leftEye[1]);
+            ctx.lineTo(leftEye[0] - eyeDistance * 1.2, leftEye[1] + 10);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(rightEye[0] + eyeDistance * 0.6, rightEye[1]);
+            ctx.lineTo(rightEye[0] + eyeDistance * 1.2, rightEye[1] + 10);
+            ctx.stroke();
+        }
+
+        function getGlassesColor(model) {
+            const colors = {
+                'wayfarer': '#000000',
+                'hawkers': '#1a1a1a',
+                'clubmaster': '#8B4513',
+                'aviator': '#C0C0C0'
+            };
+            return colors[model] || '#000000';
+        }
+
+        // Selector de gafas
+        document.querySelectorAll('.glass-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.glass-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                currentGlasses = this.getAttribute('data-model');
+            });
+        });
+
+        // Capturar foto
+        document.getElementById('captureBtn').addEventListener('click', function() {
+            const captureCanvas = document.createElement('canvas');
+            captureCanvas.width = video.videoWidth;
+            captureCanvas.height = video.videoHeight;
+            const captureCtx = captureCanvas.getContext('2d');
+
+            // Dibujar video
+            captureCtx.drawImage(video, 0, 0);
+            
+            // Dibujar overlay de gafas
+            captureCtx.drawImage(canvas, 0, 0);
+
+            // Descargar
+            captureCanvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `optica-villa-del-mar-${currentGlasses}.jpg`;
+                a.click();
+            });
+
+            alert('📸 Foto capturada! Se descargará automáticamente.');
+        });
+
+        // Limpiar al salir
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>
