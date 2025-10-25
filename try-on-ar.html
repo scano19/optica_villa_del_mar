@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -32,11 +32,25 @@
             color: white;
             padding: 20px;
             text-align: center;
+            position: relative;
         }
 
         .header h1 {
             font-size: 1.8em;
             margin-bottom: 8px;
+        }
+
+        .pro-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8em;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         .main-content {
@@ -70,17 +84,37 @@
             pointer-events: none;
         }
 
+        .detection-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            display: none;
+        }
+
+        .detection-indicator.active {
+            display: block;
+        }
+
+        .detection-indicator.good {
+            background: rgba(40, 167, 69, 0.9);
+        }
+
         .controls {
             text-align: center;
             margin: 20px 0;
         }
 
         .btn {
-            padding: 15px 35px;
-            margin: 8px;
+            padding: 12px 30px;
+            margin: 8px 5px;
             border: none;
             border-radius: 50px;
-            font-size: 1em;
+            font-size: 0.95em;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
@@ -107,38 +141,118 @@
             border: 2px solid #0066CC;
         }
 
-        .btn-secondary:hover {
+        .size-control {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .size-control.active {
+            display: block;
+        }
+
+        .size-control h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
             background: #0066CC;
-            color: white;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0066CC;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            font-weight: bold;
+            color: #0066CC;
+            min-width: 40px;
         }
 
         .glasses-selector {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 15px;
             margin: 20px auto;
             max-width: 600px;
         }
 
         .glass-option {
-            padding: 15px;
-            border: 2px solid #ddd;
+            padding: 20px;
+            border: 3px solid #ddd;
             border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s;
             background: white;
             text-align: center;
+            position: relative;
         }
 
         .glass-option:hover {
             border-color: #0066CC;
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,102,204,0.3);
         }
 
         .glass-option.active {
             border-color: #0066CC;
-            background: #e6f2ff;
+            background: linear-gradient(135deg, #e6f2ff, #cce5ff);
             font-weight: bold;
+            box-shadow: 0 10px 25px rgba(0,102,204,0.4);
+        }
+
+        .glass-preview {
+            width: 80px;
+            height: 40px;
+            margin: 0 auto 10px;
+            position: relative;
+        }
+
+        .glass-name {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .glass-price {
+            color: #28a745;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .glass-details {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
         }
 
         .status {
@@ -165,39 +279,12 @@
             color: #721c24;
         }
 
-        .instructions {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-
-        .instructions h3 {
-            color: #333;
-            margin-bottom: 12px;
-        }
-
-        .instructions ol {
-            margin-left: 20px;
-            line-height: 1.8;
-            color: #666;
-        }
-
         .back-link {
             display: inline-block;
             margin: 15px 0;
             color: #0066CC;
             text-decoration: none;
             font-weight: bold;
-        }
-
-        .tip {
-            margin-top: 15px;
-            padding: 12px;
-            background: #e7f3ff;
-            border-left: 4px solid #0066CC;
-            border-radius: 5px;
-            font-size: 0.9em;
         }
 
         .loading-spinner {
@@ -234,8 +321,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎥 Prueba Virtual con IA</h1>
-            <p>Detección facial inteligente en tiempo real</p>
+            <span class="pro-badge">✨ ULTRA HD</span>
+            <h1>🎥 Prueba Virtual AR</h1>
+            <p>Gafas realistas con detalles profesionales</p>
         </div>
 
         <div class="main-content">
@@ -248,6 +336,9 @@
             <div class="camera-container" id="cameraContainer" style="display: none;">
                 <video id="webcam" autoplay playsinline muted></video>
                 <canvas id="overlay" class="overlay-canvas"></canvas>
+                <div class="detection-indicator" id="detectionIndicator">
+                    👤 Detectando rostro...
+                </div>
             </div>
 
             <div class="controls">
@@ -255,46 +346,74 @@
                 <button class="btn btn-secondary" id="captureBtn" style="display: none;">📸 Capturar Foto</button>
             </div>
 
-            <div class="glasses-selector" id="glassesSelector" style="display: none;">
-                <div class="glass-option active" data-model="wayfarer">
-                    <div style="font-size: 1.5em; margin-bottom: 5px;">⬛</div>
-                    Wayfarer
-                </div>
-                <div class="glass-option" data-model="hawkers">
-                    <div style="font-size: 1.5em; margin-bottom: 5px;">⚫</div>
-                    Hawkers
-                </div>
-                <div class="glass-option" data-model="clubmaster">
-                    <div style="font-size: 1.5em; margin-bottom: 5px;">🟤</div>
-                    Clubmaster
-                </div>
-                <div class="glass-option" data-model="aviator">
-                    <div style="font-size: 1.5em; margin-bottom: 5px;">⚪</div>
-                    Aviator
+            <div class="size-control" id="sizeControl">
+                <h4>🔍 Ajustar tamaño de gafas</h4>
+                <div class="slider-container">
+                    <span>−</span>
+                    <input type="range" min="70" max="130" value="100" class="slider" id="sizeSlider">
+                    <span>+</span>
+                    <span class="slider-value" id="sizeValue">100%</span>
                 </div>
             </div>
 
-            <div class="instructions">
-                <h3>📋 Cómo funciona:</h3>
-                <ol>
-                    <li><strong>Activa la cámara:</strong> Haz clic en el botón y permite el acceso</li>
-                    <li><strong>Espera la carga:</strong> El modelo de IA tardará unos segundos</li>
-                    <li><strong>Posiciónate:</strong> Colócate frente a la cámara con buena iluminación</li>
-                    <li><strong>Prueba modelos:</strong> Las gafas se ajustarán automáticamente a tu rostro</li>
-                    <li><strong>Mueve la cabeza:</strong> Gira para ver cómo se ven desde diferentes ángulos</li>
-                    <li><strong>Captura:</strong> Haz clic en "📸 Capturar Foto" cuando te guste</li>
-                </ol>
-                <div class="tip">
-                    <strong>⚡ Tecnología:</strong> Usamos BlazeFace (TensorFlow.js) para detección facial ultrarrápida. Es más ligero y funciona mejor en móviles que otros modelos.
+            <div class="glasses-selector" id="glassesSelector" style="display: none;">
+                <div class="glass-option active" data-model="wayfarer">
+                    <div class="glass-preview">
+                        <svg width="80" height="40" viewBox="0 0 80 40">
+                            <rect x="5" y="10" width="30" height="20" rx="2" fill="#000" stroke="#333" stroke-width="2"/>
+                            <rect x="45" y="10" width="30" height="20" rx="2" fill="#000" stroke="#333" stroke-width="2"/>
+                            <line x1="35" y1="20" x2="45" y2="20" stroke="#000" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="glass-name">Ray-Ban Wayfarer</div>
+                    <div class="glass-price">155€</div>
+                    <div class="glass-details">Acetato negro mate</div>
                 </div>
-                <p style="margin-top: 15px; color: #999; font-size: 0.85em; text-align: center;">
-                    🔒 100% privado - Procesamiento local - No guardamos tus imágenes
-                </p>
+
+                <div class="glass-option" data-model="hawkers">
+                    <div class="glass-preview">
+                        <svg width="80" height="40" viewBox="0 0 80 40">
+                            <rect x="5" y="12" width="28" height="18" rx="1" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+                            <rect x="47" y="12" width="28" height="18" rx="1" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+                            <line x1="33" y1="21" x2="47" y2="21" stroke="#1a1a1a" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="glass-name">Hawkers Carbono</div>
+                    <div class="glass-price">35€</div>
+                    <div class="glass-details">TR90 deportivo</div>
+                </div>
+
+                <div class="glass-option" data-model="clubmaster">
+                    <div class="glass-preview">
+                        <svg width="80" height="40" viewBox="0 0 80 40">
+                            <ellipse cx="20" cy="20" rx="15" ry="12" fill="rgba(139,69,19,0.2)" stroke="#8B4513" stroke-width="2"/>
+                            <ellipse cx="60" cy="20" rx="15" ry="12" fill="rgba(139,69,19,0.2)" stroke="#8B4513" stroke-width="2"/>
+                            <path d="M5 15 Q20 12 35 15" stroke="#8B4513" stroke-width="3" fill="none"/>
+                            <path d="M45 15 Q60 12 75 15" stroke="#8B4513" stroke-width="3" fill="none"/>
+                            <line x1="35" y1="20" x2="45" y2="20" stroke="#C0C0C0" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="glass-name">Ray-Ban Clubmaster</div>
+                    <div class="glass-price">165€</div>
+                    <div class="glass-details">Acetato + metal</div>
+                </div>
+
+                <div class="glass-option" data-model="aviator">
+                    <div class="glass-preview">
+                        <svg width="80" height="40" viewBox="0 0 80 40">
+                            <ellipse cx="20" cy="20" rx="16" ry="14" fill="rgba(200,200,200,0.2)" stroke="#C0C0C0" stroke-width="1.5"/>
+                            <ellipse cx="60" cy="20" rx="16" ry="14" fill="rgba(200,200,200,0.2)" stroke="#C0C0C0" stroke-width="1.5"/>
+                            <line x1="36" y1="20" x2="44" y2="20" stroke="#C0C0C0" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="glass-name">Ray-Ban Aviator</div>
+                    <div class="glass-price">165€</div>
+                    <div class="glass-details">Metal dorado</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- TensorFlow.js con BlazeFace (más ligero y compatible) -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.19.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.js"></script>
 
@@ -305,36 +424,47 @@
         let stream;
         let isDetecting = false;
         let animationId;
+        let glassesSize = 1.0;
+        
+        // Estabilización mejorada
+        let smoothedEyePositions = {
+            left: null,
+            right: null
+        };
+        const smoothingFactor = 0.75; // Mayor = más suave
 
         document.getElementById('startBtn').addEventListener('click', initCamera);
+        document.getElementById('sizeSlider').addEventListener('input', updateGlassesSize);
+
+        function updateGlassesSize(e) {
+            glassesSize = e.target.value / 100;
+            document.getElementById('sizeValue').textContent = e.target.value + '%';
+        }
 
         async function initCamera() {
             const statusDiv = document.getElementById('status');
             const cameraContainer = document.getElementById('cameraContainer');
             const glassesSelector = document.getElementById('glassesSelector');
             const startBtn = document.getElementById('startBtn');
+            const sizeControl = document.getElementById('sizeControl');
 
             try {
                 startBtn.disabled = true;
                 startBtn.innerHTML = '⏳ Iniciando...';
                 
                 statusDiv.className = 'status loading';
-                statusDiv.innerHTML = '🔄 Solicitando acceso a la cámara...<br><small>Haz clic en "Permitir" cuando te lo pida</small>';
+                statusDiv.innerHTML = '🔄 Activando cámara...<br><small>Permite el acceso cuando te lo pida</small>';
 
-                // Detectar si es móvil
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-                // Solicitar cámara
-                const constraints = {
+                stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'user',
                         width: { ideal: isMobile ? 480 : 640 },
                         height: { ideal: isMobile ? 640 : 480 }
                     },
                     audio: false
-                };
-
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                });
 
                 video = document.getElementById('webcam');
                 canvas = document.getElementById('overlay');
@@ -351,173 +481,401 @@
                         }).catch(reject);
                     };
                     video.onerror = reject;
-                    setTimeout(() => reject(new Error('Timeout cargando video')), 10000);
+                    setTimeout(() => reject(new Error('Timeout')), 10000);
                 });
 
                 statusDiv.className = 'status loading';
-                statusDiv.innerHTML = '🤖 Cargando modelo BlazeFace...<br><div class="loading-spinner"></div><br><small>Cargando modelo ultrarrápido de detección facial...<br>Solo tardará unos segundos.</small>';
+                statusDiv.innerHTML = '🤖 Cargando IA...<br><div class="loading-spinner"></div>';
 
-                // Cargar BlazeFace (mucho más ligero que FaceMesh)
                 model = await blazeface.load();
 
                 statusDiv.className = 'status ready';
-                statusDiv.innerHTML = '✅ <strong>¡Sistema listo!</strong><br>Mira a la cámara y las gafas se ajustarán automáticamente';
+                statusDiv.innerHTML = '✅ <strong>¡Listo!</strong> Ajusta el tamaño con el deslizador si es necesario';
 
                 cameraContainer.style.display = 'block';
                 startBtn.style.display = 'none';
                 document.getElementById('captureBtn').style.display = 'inline-block';
                 glassesSelector.style.display = 'grid';
+                sizeControl.classList.add('active');
+                document.getElementById('detectionIndicator').classList.add('active');
 
-                // Iniciar detección
                 isDetecting = true;
                 detectFace();
 
             } catch (error) {
-                console.error('Error completo:', error);
+                console.error('Error:', error);
                 statusDiv.className = 'status error';
-                
-                let errorHTML = '❌ <strong>Error al iniciar</strong><br><br>';
-                
-                if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-                    errorHTML += '📷 <strong>Acceso denegado a la cámara</strong><br><br>';
-                    errorHTML += '<strong>Solución:</strong><br>';
-                    errorHTML += '1. Busca el icono 🎥 en la barra de direcciones<br>';
-                    errorHTML += '2. Haz clic y selecciona "Permitir"<br>';
-                    errorHTML += '3. Recarga la página o haz clic en Reintentar';
-                } else if (error.name === 'NotFoundError') {
-                    errorHTML += '📷 <strong>No se encontró cámara</strong><br><br>';
-                    errorHTML += 'Verifica que tu dispositivo tenga una cámara web conectada.';
-                } else if (error.name === 'NotReadableError') {
-                    errorHTML += '📷 <strong>Cámara en uso</strong><br><br>';
-                    errorHTML += 'Cierra otras aplicaciones que puedan estar usando la cámara.';
-                } else {
-                    errorHTML += '⚠️ ' + (error.message || 'Error desconocido') + '<br><br>';
-                    errorHTML += '<strong>Intenta:</strong><br>';
-                    errorHTML += '• Usar Chrome o Safari<br>';
-                    errorHTML += '• Dar permisos de cámara en configuración<br>';
-                    errorHTML += '• Reiniciar el navegador';
-                }
-                
-                statusDiv.innerHTML = errorHTML;
-                
+                statusDiv.innerHTML = '❌ Error al iniciar. Por favor, recarga la página.';
                 startBtn.disabled = false;
                 startBtn.innerHTML = '🔄 Reintentar';
-                startBtn.style.display = 'inline-block';
             }
         }
 
         async function detectFace() {
-            if (!isDetecting || !model || !video || video.paused || video.ended) {
-                return;
-            }
+            if (!isDetecting || !model || !video) return;
 
             try {
-                // BlazeFace devuelve cajas delimitadoras (bounding boxes) del rostro
                 const predictions = await model.estimateFaces(video, false);
-
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+                const indicator = document.getElementById('detectionIndicator');
+
                 if (predictions.length > 0) {
-                    const face = predictions[0];
-                    drawGlassesFromBoundingBox(face);
+                    drawRealisticGlasses(predictions[0]);
+                    indicator.textContent = '✅ Perfecto';
+                    indicator.className = 'detection-indicator active good';
+                } else {
+                    indicator.textContent = '⚠️ Busca tu rostro';
+                    indicator.className = 'detection-indicator active';
                 }
             } catch (error) {
-                console.error('Error en detección:', error);
+                console.error('Error:', error);
             }
 
             animationId = requestAnimationFrame(detectFace);
         }
 
-        function drawGlassesFromBoundingBox(face) {
-            // BlazeFace proporciona:
-            // - topLeft: [x, y]
-            // - bottomRight: [x, y]
-            // - landmarks: [[rightEye], [leftEye], [nose], [mouth], [rightEar], [leftEar]]
+        function smoothEyePosition(newPos, oldPos) {
+            if (!oldPos) return newPos;
+            return [
+                oldPos[0] * smoothingFactor + newPos[0] * (1 - smoothingFactor),
+                oldPos[1] * smoothingFactor + newPos[1] * (1 - smoothingFactor)
+            ];
+        }
 
-            const topLeft = face.topLeft;
-            const bottomRight = face.bottomRight;
+        function drawRealisticGlasses(face) {
             const landmarks = face.landmarks;
+            const rightEye = landmarks[0];
+            const leftEye = landmarks[1];
 
-            // Obtener posiciones de los ojos
-            const rightEye = landmarks[0]; // Ojo derecho (desde perspectiva del usuario)
-            const leftEye = landmarks[1];  // Ojo izquierdo
+            // Suavizado
+            smoothedEyePositions.right = smoothEyePosition(rightEye, smoothedEyePositions.right);
+            smoothedEyePositions.left = smoothEyePosition(leftEye, smoothedEyePositions.left);
 
-            // Calcular distancia entre ojos
-            const eyeDistance = Math.sqrt(
-                Math.pow(leftEye[0] - rightEye[0], 2) + 
-                Math.pow(leftEye[1] - rightEye[1], 2)
-            );
+            const re = smoothedEyePositions.right;
+            const le = smoothedEyePositions.left;
 
-            const lensRadius = eyeDistance * 0.35;
-            const style = getGlassesStyle(currentGlasses);
+            const eyeDistance = Math.sqrt(Math.pow(le[0] - re[0], 2) + Math.pow(le[1] - re[1], 2));
+            const angle = Math.atan2(le[1] - re[1], le[0] - re[0]);
+
+            ctx.save();
+
+            // Dibujar según el modelo
+            switch(currentGlasses) {
+                case 'wayfarer':
+                    drawWayfarer(re, le, eyeDistance, angle);
+                    break;
+                case 'hawkers':
+                    drawHawkers(re, le, eyeDistance, angle);
+                    break;
+                case 'clubmaster':
+                    drawClubmaster(re, le, eyeDistance, angle);
+                    break;
+                case 'aviator':
+                    drawAviator(re, le, eyeDistance, angle);
+                    break;
+            }
+
+            ctx.restore();
+        }
+
+        function drawWayfarer(re, le, distance, angle) {
+            const size = distance * 0.38 * glassesSize;
+            const thickness = 6;
+
+            // Sombra
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetY = 3;
+
+            // Marco negro brillante
+            ctx.fillStyle = '#000000';
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = thickness;
+
+            // Lente derecha - rectangular redondeada
+            drawRoundedRect(re[0] - size * 0.6, re[1] - size * 0.5, size * 1.2, size, size * 0.15);
             
-            ctx.strokeStyle = style.color;
-            ctx.lineWidth = 4;
-            ctx.fillStyle = style.lensColor;
+            // Lente izquierda
+            drawRoundedRect(le[0] - size * 0.6, le[1] - size * 0.5, size * 1.2, size, size * 0.15);
 
-            // Lente derecha (en la imagen)
-            ctx.beginPath();
-            if (style.shape === 'round') {
-                ctx.arc(rightEye[0], rightEye[1], lensRadius, 0, 2 * Math.PI);
-            } else {
-                ctx.ellipse(rightEye[0], rightEye[1], lensRadius * 1.3, lensRadius * 0.9, 0, 0, 2 * Math.PI);
-            }
-            ctx.fill();
-            ctx.stroke();
+            // Cristales oscuros con gradiente
+            const gradient1 = ctx.createLinearGradient(re[0], re[1] - size * 0.5, re[0], re[1] + size * 0.5);
+            gradient1.addColorStop(0, 'rgba(20, 20, 20, 0.85)');
+            gradient1.addColorStop(1, 'rgba(10, 10, 10, 0.75)');
+            
+            ctx.fillStyle = gradient1;
+            drawRoundedRect(re[0] - size * 0.55, re[1] - size * 0.45, size * 1.1, size * 0.9, size * 0.12, true);
+            drawRoundedRect(le[0] - size * 0.55, le[1] - size * 0.45, size * 1.1, size * 0.9, size * 0.12, true);
 
-            // Lente izquierda (en la imagen)
+            // Reflejos realistas
+            ctx.shadowColor = 'transparent';
+            const refGrad = ctx.createRadialGradient(re[0] - size * 0.25, re[1] - size * 0.25, 0, re[0] - size * 0.25, re[1] - size * 0.25, size * 0.4);
+            refGrad.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+            refGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = refGrad;
             ctx.beginPath();
-            if (style.shape === 'round') {
-                ctx.arc(leftEye[0], leftEye[1], lensRadius, 0, 2 * Math.PI);
-            } else {
-                ctx.ellipse(leftEye[0], leftEye[1], lensRadius * 1.3, lensRadius * 0.9, 0, 0, 2 * Math.PI);
-            }
+            ctx.arc(re[0] - size * 0.25, re[1] - size * 0.25, size * 0.4, 0, 2 * Math.PI);
             ctx.fill();
-            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(le[0] - size * 0.25, le[1] - size * 0.25, size * 0.4, 0, 2 * Math.PI);
+            ctx.fill();
 
             // Puente
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = thickness;
             ctx.beginPath();
-            ctx.moveTo(rightEye[0] + lensRadius * 0.8, rightEye[1]);
-            ctx.lineTo(leftEye[0] - lensRadius * 0.8, leftEye[1]);
+            ctx.moveTo(re[0] + size * 0.6, re[1]);
+            ctx.lineTo(le[0] - size * 0.6, le[1]);
             ctx.stroke();
 
-            // Patilla derecha
+            // Patillas con detalle
+            ctx.lineWidth = thickness - 1;
             ctx.beginPath();
-            ctx.moveTo(rightEye[0] - lensRadius * 1.1, rightEye[1]);
-            ctx.lineTo(rightEye[0] - lensRadius * 1.8, rightEye[1] + lensRadius * 0.3);
+            ctx.moveTo(re[0] - size * 0.6, re[1]);
+            ctx.lineTo(re[0] - size * 1.3, re[1] + size * 0.15);
             ctx.stroke();
 
-            // Patilla izquierda
             ctx.beginPath();
-            ctx.moveTo(leftEye[0] + lensRadius * 1.1, leftEye[1]);
-            ctx.lineTo(leftEye[0] + lensRadius * 1.8, leftEye[1] + lensRadius * 0.3);
+            ctx.moveTo(le[0] + size * 0.6, le[1]);
+            ctx.lineTo(le[0] + size * 1.3, le[1] + size * 0.15);
+            ctx.stroke();
+
+            // Logo Ray-Ban (simulado)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `${size * 0.15}px Arial`;
+            ctx.fillText('RB', re[0] + size * 0.15, re[1]);
+        }
+
+        function drawHawkers(re, le, distance, angle) {
+            const size = distance * 0.36 * glassesSize;
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 2;
+
+            // Marco deportivo negro
+            ctx.fillStyle = '#1a1a1a';
+            ctx.strokeStyle = '#2a2a2a';
+            ctx.lineWidth = 5;
+
+            drawRoundedRect(re[0] - size * 0.55, re[1] - size * 0.45, size * 1.1, size * 0.9, size * 0.1);
+            drawRoundedRect(le[0] - size * 0.55, le[1] - size * 0.45, size * 1.1, size * 0.9, size * 0.1);
+
+            // Cristales polarizados
+            const gradient = ctx.createLinearGradient(re[0], re[1] - size * 0.4, re[0], re[1] + size * 0.4);
+            gradient.addColorStop(0, 'rgba(30, 30, 30, 0.7)');
+            gradient.addColorStop(1, 'rgba(50, 50, 50, 0.6)');
+            
+            ctx.fillStyle = gradient;
+            drawRoundedRect(re[0] - size * 0.5, re[1] - size * 0.4, size, size * 0.8, size * 0.08, true);
+            drawRoundedRect(le[0] - size * 0.5, le[1] - size * 0.4, size, size * 0.8, size * 0.08, true);
+
+            // Puente deportivo
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(re[0] + size * 0.55, re[1]);
+            ctx.lineTo(le[0] - size * 0.55, le[1]);
+            ctx.stroke();
+
+            // Patillas
+            ctx.beginPath();
+            ctx.moveTo(re[0] - size * 0.55, re[1]);
+            ctx.lineTo(re[0] - size * 1.2, re[1] + size * 0.1);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(le[0] + size * 0.55, le[1]);
+            ctx.lineTo(le[0] + size * 1.2, le[1] + size * 0.1);
             ctx.stroke();
         }
 
-        function getGlassesStyle(model) {
-            const styles = {
-                'wayfarer': {
-                    color: '#000000',
-                    lensColor: 'rgba(20, 20, 20, 0.6)',
-                    shape: 'square'
-                },
-                'hawkers': {
-                    color: '#1a1a1a',
-                    lensColor: 'rgba(30, 30, 30, 0.5)',
-                    shape: 'square'
-                },
-                'clubmaster': {
-                    color: '#8B4513',
-                    lensColor: 'rgba(139, 69, 19, 0.3)',
-                    shape: 'round'
-                },
-                'aviator': {
-                    color: '#C0C0C0',
-                    lensColor: 'rgba(100, 100, 100, 0.3)',
-                    shape: 'round'
-                }
-            };
-            return styles[model] || styles['wayfarer'];
+        function drawClubmaster(re, le, distance, angle) {
+            const size = distance * 0.37 * glassesSize;
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+            ctx.shadowBlur = 9;
+            ctx.shadowOffsetY = 3;
+
+            // Barra superior de acetato marrón
+            ctx.fillStyle = '#8B4513';
+            ctx.strokeStyle = '#654321';
+            ctx.lineWidth = 7;
+            
+            ctx.beginPath();
+            ctx.arc(re[0], re[1], size * 0.65, Math.PI * 0.9, Math.PI * 0.1, true);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(le[0], le[1], size * 0.65, Math.PI * 0.9, Math.PI * 0.1, true);
+            ctx.stroke();
+
+            // Aros de metal dorado
+            ctx.strokeStyle = '#DAA520';
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.arc(re[0], re[1], size * 0.6, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(le[0], le[1], size * 0.6, 0, 2 * Math.PI);
+            ctx.stroke();
+
+            // Cristales con tinte
+            const gradient = ctx.createRadialGradient(re[0], re[1], 0, re[0], re[1], size * 0.6);
+            gradient.addColorStop(0, 'rgba(139, 69, 19, 0.35)');
+            gradient.addColorStop(1, 'rgba(139, 69, 19, 0.45)');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(re[0], re[1], size * 0.58, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(le[0], le[1], size * 0.58, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Reflejos en cristales
+            ctx.shadowColor = 'transparent';
+            const refGrad = ctx.createRadialGradient(re[0] - size * 0.2, re[1] - size * 0.2, 0, re[0] - size * 0.2, re[1] - size * 0.2, size * 0.35);
+            refGrad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+            refGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = refGrad;
+            ctx.beginPath();
+            ctx.arc(re[0] - size * 0.2, re[1] - size * 0.2, size * 0.35, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(le[0] - size * 0.2, le[1] - size * 0.2, size * 0.35, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Puente metálico
+            ctx.strokeStyle = '#C0C0C0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(re[0] + size * 0.6, re[1]);
+            ctx.lineTo(le[0] - size * 0.6, le[1]);
+            ctx.stroke();
+
+            // Patillas
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(re[0] - size * 0.6, re[1]);
+            ctx.lineTo(re[0] - size * 1.25, re[1] + size * 0.15);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(le[0] + size * 0.6, le[1]);
+            ctx.lineTo(le[0] + size * 1.25, le[1] + size * 0.15);
+            ctx.stroke();
+        }
+
+        function drawAviator(re, le, distance, angle) {
+            const size = distance * 0.38 * glassesSize;
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetY = 4;
+
+            // Marco metálico dorado
+            ctx.strokeStyle = '#DAA520';
+            ctx.lineWidth = 2.5;
+            
+            ctx.beginPath();
+            ctx.arc(re[0], re[1], size * 0.68, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(le[0], le[1], size * 0.68, 0, 2 * Math.PI);
+            ctx.stroke();
+
+            // Cristales G-15 (verde-marrón)
+            const gradient = ctx.createRadialGradient(re[0], re[1], 0, re[0], re[1], size * 0.68);
+            gradient.addColorStop(0, 'rgba(80, 100, 80, 0.5)');
+            gradient.addColorStop(1, 'rgba(60, 80, 60, 0.6)');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(re[0], re[1], size * 0.66, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(le[0], le[1], size * 0.66, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Reflejos espejados
+            ctx.shadowColor = 'transparent';
+            const refGrad = ctx.createRadialGradient(re[0] - size * 0.25, re[1] - size * 0.25, 0, re[0] - size * 0.25, re[1] - size * 0.25, size * 0.45);
+            refGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+            refGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+            refGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = refGrad;
+            ctx.beginPath();
+            ctx.arc(re[0] - size * 0.25, re[1] - size * 0.25, size * 0.45, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(le[0] - size * 0.25, le[1] - size * 0.25, size * 0.45, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Doble puente característico
+            ctx.strokeStyle = '#DAA520';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(re[0] + size * 0.68, re[1]);
+            ctx.lineTo(le[0] - size * 0.68, le[1]);
+            ctx.stroke();
+
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(re[0] + size * 0.68, re[1] - size * 0.08);
+            ctx.lineTo(le[0] - size * 0.68, le[1] - size * 0.08);
+            ctx.stroke();
+
+            // Patillas metálicas finas
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(re[0] - size * 0.68, re[1]);
+            ctx.lineTo(re[0] - size * 1.4, re[1] + size * 0.2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(le[0] + size * 0.68, le[1]);
+            ctx.lineTo(le[0] + size * 1.4, le[1] + size * 0.2);
+            ctx.stroke();
+
+            // Logo RB
+            ctx.fillStyle = '#DAA520';
+            ctx.font = `bold ${size * 0.12}px Arial`;
+            ctx.fillText('RB', re[0] - size * 0.1, re[1] + size * 0.5);
+        }
+
+        function drawRoundedRect(x, y, width, height, radius, fillOnly = false) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            
+            if (fillOnly) {
+                ctx.fill();
+            } else {
+                ctx.fill();
+                ctx.stroke();
+            }
         }
 
         // Selector de gafas
@@ -531,49 +889,37 @@
 
         // Capturar foto
         document.getElementById('captureBtn').addEventListener('click', function() {
-            try {
-                const captureCanvas = document.createElement('canvas');
-                captureCanvas.width = video.videoWidth;
-                captureCanvas.height = video.videoHeight;
-                const captureCtx = captureCanvas.getContext('2d');
+            const captureCanvas = document.createElement('canvas');
+            captureCanvas.width = video.videoWidth;
+            captureCanvas.height = video.videoHeight;
+            const captureCtx = captureCanvas.getContext('2d');
 
-                captureCtx.drawImage(video, 0, 0);
-                captureCtx.drawImage(canvas, 0, 0);
+            captureCtx.drawImage(video, 0, 0);
+            captureCtx.drawImage(canvas, 0, 0);
 
-                captureCanvas.toBlob(blob => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `optica-villa-del-mar-${currentGlasses}-${Date.now()}.jpg`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
+            captureCanvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `optica-${currentGlasses}-${Date.now()}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
 
-                    const statusDiv = document.getElementById('status');
-                    statusDiv.className = 'status ready';
-                    statusDiv.innerHTML = '📸 <strong>¡Foto capturada!</strong><br>Se está descargando...';
-                    
-                    setTimeout(() => {
-                        statusDiv.innerHTML = '✅ <strong>¡Sistema listo!</strong><br>Sigue probando diferentes modelos';
-                    }, 3000);
-                }, 'image/jpeg', 0.95);
-
-            } catch (error) {
-                console.error('Error al capturar:', error);
-                alert('Error al capturar la foto. Inténtalo de nuevo.');
-            }
+                const statusDiv = document.getElementById('status');
+                statusDiv.className = 'status ready';
+                statusDiv.innerHTML = '📸 ¡Foto guardada!';
+                setTimeout(() => {
+                    statusDiv.innerHTML = '✅ ¡Listo! Sigue probando';
+                }, 2000);
+            }, 'image/jpeg', 0.95);
         });
 
-        // Limpiar recursos al salir
         window.addEventListener('beforeunload', () => {
             isDetecting = false;
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-            }
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+            if (animationId) cancelAnimationFrame(animationId);
+            if (stream) stream.getTracks().forEach(track => track.stop());
         });
     </script>
 </body>
