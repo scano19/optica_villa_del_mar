@@ -235,7 +235,7 @@
     <div class="container">
         <div class="header">
             <h1>🎥 Prueba Virtual con IA</h1>
-            <p>Detección facial en tiempo real con TensorFlow.js</p>
+            <p>Detección facial inteligente en tiempo real</p>
         </div>
 
         <div class="main-content">
@@ -278,17 +278,14 @@
                 <h3>📋 Cómo funciona:</h3>
                 <ol>
                     <li><strong>Activa la cámara:</strong> Haz clic en el botón y permite el acceso</li>
-                    <li><strong>Espera la carga:</strong> El modelo de IA tardará 10-20 segundos (solo la primera vez)</li>
+                    <li><strong>Espera la carga:</strong> El modelo de IA tardará unos segundos</li>
                     <li><strong>Posiciónate:</strong> Colócate frente a la cámara con buena iluminación</li>
-                    <li><strong>Prueba modelos:</strong> Selecciona diferentes gafas para verlas en tu rostro</li>
+                    <li><strong>Prueba modelos:</strong> Las gafas se ajustarán automáticamente a tu rostro</li>
                     <li><strong>Mueve la cabeza:</strong> Gira para ver cómo se ven desde diferentes ángulos</li>
                     <li><strong>Captura:</strong> Haz clic en "📸 Capturar Foto" cuando te guste</li>
                 </ol>
                 <div class="tip">
-                    <strong>⚡ Tecnología:</strong> Usamos TensorFlow.js con el modelo MediaPipe FaceMesh para detección facial en tiempo real. Todo se procesa en tu dispositivo, sin enviar imágenes a ningún servidor.
-                </div>
-                <div class="tip" style="margin-top: 10px; background: #fff3cd; border-left-color: #856404;">
-                    <strong>📱 Móviles:</strong> En dispositivos móviles la carga inicial puede tardar hasta 30 segundos. Ten paciencia, ¡vale la pena!
+                    <strong>⚡ Tecnología:</strong> Usamos BlazeFace (TensorFlow.js) para detección facial ultrarrápida. Es más ligero y funciona mejor en móviles que otros modelos.
                 </div>
                 <p style="margin-top: 15px; color: #999; font-size: 0.85em; text-align: center;">
                     🔒 100% privado - Procesamiento local - No guardamos tus imágenes
@@ -297,11 +294,9 @@
         </div>
     </div>
 
-    <!-- TensorFlow.js y Face Landmarks Detection -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.11.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.11.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.11.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.2"></script>
+    <!-- TensorFlow.js con BlazeFace (más ligero y compatible) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.19.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.js"></script>
 
     <script>
         let video, canvas, ctx;
@@ -360,17 +355,13 @@
                 });
 
                 statusDiv.className = 'status loading';
-                statusDiv.innerHTML = '🤖 Cargando modelo de Inteligencia Artificial...<br><div class="loading-spinner"></div><br><small>Esto puede tardar 10-30 segundos dependiendo de tu dispositivo.<br>Por favor, espera...</small>';
+                statusDiv.innerHTML = '🤖 Cargando modelo BlazeFace...<br><div class="loading-spinner"></div><br><small>Cargando modelo ultrarrápido de detección facial...<br>Solo tardará unos segundos.</small>';
 
-                // Cargar modelo de detección facial
-                await tf.ready();
-                model = await faceLandmarksDetection.load(
-                    faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
-                    { maxFaces: 1 }
-                );
+                // Cargar BlazeFace (mucho más ligero que FaceMesh)
+                model = await blazeface.load();
 
                 statusDiv.className = 'status ready';
-                statusDiv.innerHTML = '✅ <strong>¡Sistema listo!</strong><br>Mira a la cámara y las gafas se colocarán automáticamente en tu rostro';
+                statusDiv.innerHTML = '✅ <strong>¡Sistema listo!</strong><br>Mira a la cámara y las gafas se ajustarán automáticamente';
 
                 cameraContainer.style.display = 'block';
                 startBtn.style.display = 'none';
@@ -421,18 +412,14 @@
             }
 
             try {
-                const predictions = await model.estimateFaces({
-                    input: video,
-                    returnTensors: false,
-                    flipHorizontal: false,
-                    predictIrises: false
-                });
+                // BlazeFace devuelve cajas delimitadoras (bounding boxes) del rostro
+                const predictions = await model.estimateFaces(video, false);
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 if (predictions.length > 0) {
-                    const keypoints = predictions[0].scaledMesh;
-                    drawGlasses(keypoints);
+                    const face = predictions[0];
+                    drawGlassesFromBoundingBox(face);
                 }
             } catch (error) {
                 console.error('Error en detección:', error);
@@ -441,28 +428,24 @@
             animationId = requestAnimationFrame(detectFace);
         }
 
-        function drawGlasses(keypoints) {
-            // Puntos clave faciales para ojos
-            const leftEyeOuter = keypoints[33];
-            const leftEyeInner = keypoints[133];
-            const rightEyeInner = keypoints[362];
-            const rightEyeOuter = keypoints[263];
+        function drawGlassesFromBoundingBox(face) {
+            // BlazeFace proporciona:
+            // - topLeft: [x, y]
+            // - bottomRight: [x, y]
+            // - landmarks: [[rightEye], [leftEye], [nose], [mouth], [rightEar], [leftEar]]
 
-            // Calcular centros de ojos
-            const leftEyeCenter = [
-                (leftEyeOuter[0] + leftEyeInner[0]) / 2,
-                (leftEyeOuter[1] + leftEyeInner[1]) / 2
-            ];
+            const topLeft = face.topLeft;
+            const bottomRight = face.bottomRight;
+            const landmarks = face.landmarks;
 
-            const rightEyeCenter = [
-                (rightEyeOuter[0] + rightEyeInner[0]) / 2,
-                (rightEyeOuter[1] + rightEyeInner[1]) / 2
-            ];
+            // Obtener posiciones de los ojos
+            const rightEye = landmarks[0]; // Ojo derecho (desde perspectiva del usuario)
+            const leftEye = landmarks[1];  // Ojo izquierdo
 
             // Calcular distancia entre ojos
             const eyeDistance = Math.sqrt(
-                Math.pow(rightEyeCenter[0] - leftEyeCenter[0], 2) + 
-                Math.pow(rightEyeCenter[1] - leftEyeCenter[1], 2)
+                Math.pow(leftEye[0] - rightEye[0], 2) + 
+                Math.pow(leftEye[1] - rightEye[1], 2)
             );
 
             const lensRadius = eyeDistance * 0.35;
@@ -472,42 +455,42 @@
             ctx.lineWidth = 4;
             ctx.fillStyle = style.lensColor;
 
-            // Lente izquierda
+            // Lente derecha (en la imagen)
             ctx.beginPath();
             if (style.shape === 'round') {
-                ctx.arc(leftEyeCenter[0], leftEyeCenter[1], lensRadius, 0, 2 * Math.PI);
+                ctx.arc(rightEye[0], rightEye[1], lensRadius, 0, 2 * Math.PI);
             } else {
-                ctx.ellipse(leftEyeCenter[0], leftEyeCenter[1], lensRadius * 1.3, lensRadius * 0.9, 0, 0, 2 * Math.PI);
+                ctx.ellipse(rightEye[0], rightEye[1], lensRadius * 1.3, lensRadius * 0.9, 0, 0, 2 * Math.PI);
             }
             ctx.fill();
             ctx.stroke();
 
-            // Lente derecha
+            // Lente izquierda (en la imagen)
             ctx.beginPath();
             if (style.shape === 'round') {
-                ctx.arc(rightEyeCenter[0], rightEyeCenter[1], lensRadius, 0, 2 * Math.PI);
+                ctx.arc(leftEye[0], leftEye[1], lensRadius, 0, 2 * Math.PI);
             } else {
-                ctx.ellipse(rightEyeCenter[0], rightEyeCenter[1], lensRadius * 1.3, lensRadius * 0.9, 0, 0, 2 * Math.PI);
+                ctx.ellipse(leftEye[0], leftEye[1], lensRadius * 1.3, lensRadius * 0.9, 0, 0, 2 * Math.PI);
             }
             ctx.fill();
             ctx.stroke();
 
             // Puente
             ctx.beginPath();
-            ctx.moveTo(leftEyeCenter[0] + lensRadius * 0.8, leftEyeCenter[1]);
-            ctx.lineTo(rightEyeCenter[0] - lensRadius * 0.8, rightEyeCenter[1]);
-            ctx.stroke();
-
-            // Patilla izquierda
-            ctx.beginPath();
-            ctx.moveTo(leftEyeCenter[0] - lensRadius * 1.1, leftEyeCenter[1]);
-            ctx.lineTo(leftEyeCenter[0] - lensRadius * 1.8, leftEyeCenter[1] + lensRadius * 0.3);
+            ctx.moveTo(rightEye[0] + lensRadius * 0.8, rightEye[1]);
+            ctx.lineTo(leftEye[0] - lensRadius * 0.8, leftEye[1]);
             ctx.stroke();
 
             // Patilla derecha
             ctx.beginPath();
-            ctx.moveTo(rightEyeCenter[0] + lensRadius * 1.1, rightEyeCenter[1]);
-            ctx.lineTo(rightEyeCenter[0] + lensRadius * 1.8, rightEyeCenter[1] + lensRadius * 0.3);
+            ctx.moveTo(rightEye[0] - lensRadius * 1.1, rightEye[1]);
+            ctx.lineTo(rightEye[0] - lensRadius * 1.8, rightEye[1] + lensRadius * 0.3);
+            ctx.stroke();
+
+            // Patilla izquierda
+            ctx.beginPath();
+            ctx.moveTo(leftEye[0] + lensRadius * 1.1, leftEye[1]);
+            ctx.lineTo(leftEye[0] + lensRadius * 1.8, leftEye[1] + lensRadius * 0.3);
             ctx.stroke();
         }
 
