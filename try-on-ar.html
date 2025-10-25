@@ -9,7 +9,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -20,7 +19,7 @@
         }
 
         .container {
-            max-width: 100%;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -40,10 +39,6 @@
             margin-bottom: 8px;
         }
 
-        .header p {
-            font-size: 0.9em;
-        }
-
         .main-content {
             padding: 20px;
         }
@@ -51,19 +46,16 @@
         .camera-container {
             position: relative;
             width: 100%;
-            height: 0;
-            padding-bottom: 133%; /* 3:4 aspect ratio para móvil */
+            max-width: 640px;
             margin: 20px auto;
             background: #000;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            aspect-ratio: 4/3;
         }
 
         #webcam {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -84,7 +76,7 @@
         }
 
         .btn {
-            padding: 15px 30px;
+            padding: 15px 35px;
             margin: 8px;
             border: none;
             border-radius: 50px;
@@ -92,8 +84,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            width: calc(100% - 16px);
-            max-width: 300px;
         }
 
         .btn-primary {
@@ -101,8 +91,14 @@
             color: white;
         }
 
-        .btn-primary:active {
-            transform: scale(0.98);
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,102,204,0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .btn-secondary {
@@ -111,31 +107,32 @@
             border: 2px solid #0066CC;
         }
 
-        .btn-secondary:active {
+        .btn-secondary:hover {
             background: #0066CC;
             color: white;
         }
 
         .glasses-selector {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-            margin: 20px 0;
+            margin: 20px auto;
+            max-width: 600px;
         }
 
         .glass-option {
-            padding: 15px 10px;
+            padding: 15px;
             border: 2px solid #ddd;
             border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s;
             background: white;
             text-align: center;
-            font-size: 0.9em;
         }
 
-        .glass-option:active {
-            transform: scale(0.98);
+        .glass-option:hover {
+            border-color: #0066CC;
+            transform: translateY(-2px);
         }
 
         .glass-option.active {
@@ -150,6 +147,7 @@
             margin: 15px 0;
             border-radius: 10px;
             font-size: 0.95em;
+            line-height: 1.6;
         }
 
         .status.loading {
@@ -177,14 +175,12 @@
         .instructions h3 {
             color: #333;
             margin-bottom: 12px;
-            font-size: 1.1em;
         }
 
         .instructions ol {
             margin-left: 20px;
             line-height: 1.8;
             color: #666;
-            font-size: 0.9em;
         }
 
         .back-link {
@@ -193,10 +189,6 @@
             color: #0066CC;
             text-decoration: none;
             font-weight: bold;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
         }
 
         .tip {
@@ -208,12 +200,22 @@
             font-size: 0.9em;
         }
 
-        @media (min-width: 768px) {
-            .camera-container {
-                padding-bottom: 75%; /* 4:3 en desktop */
-                max-width: 640px;
-            }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0066CC;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (min-width: 768px) {
             .header h1 {
                 font-size: 2.5em;
             }
@@ -224,6 +226,7 @@
 
             .glasses-selector {
                 grid-template-columns: repeat(4, 1fr);
+                max-width: 100%;
             }
         }
     </style>
@@ -231,8 +234,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎥 Prueba Virtual AR</h1>
-            <p>Pruébate las gafas en tiempo real</p>
+            <h1>🎥 Prueba Virtual con IA</h1>
+            <p>Detección facial en tiempo real con TensorFlow.js</p>
         </div>
 
         <div class="main-content">
@@ -247,7 +250,7 @@
                 <canvas id="overlay" class="overlay-canvas"></canvas>
             </div>
 
-            <div class="controls" id="controls">
+            <div class="controls">
                 <button class="btn btn-primary" id="startBtn">🎥 Activar Cámara</button>
                 <button class="btn btn-secondary" id="captureBtn" style="display: none;">📸 Capturar Foto</button>
             </div>
@@ -272,53 +275,61 @@
             </div>
 
             <div class="instructions">
-                <h3>📋 Instrucciones:</h3>
+                <h3>📋 Cómo funciona:</h3>
                 <ol>
-                    <li>Haz clic en <strong>"Activar Cámara"</strong></li>
-                    <li>Permite el acceso cuando te lo pida</li>
-                    <li>Colócate frente a la cámara con buena luz</li>
-                    <li>Selecciona el modelo que quieras probar</li>
-                    <li>Las gafas se dibujarán sobre tu rostro</li>
-                    <li>Captura una foto cuando quieras</li>
+                    <li><strong>Activa la cámara:</strong> Haz clic en el botón y permite el acceso</li>
+                    <li><strong>Espera la carga:</strong> El modelo de IA tardará 10-20 segundos (solo la primera vez)</li>
+                    <li><strong>Posiciónate:</strong> Colócate frente a la cámara con buena iluminación</li>
+                    <li><strong>Prueba modelos:</strong> Selecciona diferentes gafas para verlas en tu rostro</li>
+                    <li><strong>Mueve la cabeza:</strong> Gira para ver cómo se ven desde diferentes ángulos</li>
+                    <li><strong>Captura:</strong> Haz clic en "📸 Capturar Foto" cuando te guste</li>
                 </ol>
                 <div class="tip">
-                    <strong>💡 Versión ligera para móviles:</strong> Esta versión usa detección facial simplificada para funcionar en todos los dispositivos. Las gafas se posicionan automáticamente en tu rostro.
+                    <strong>⚡ Tecnología:</strong> Usamos TensorFlow.js con el modelo MediaPipe FaceMesh para detección facial en tiempo real. Todo se procesa en tu dispositivo, sin enviar imágenes a ningún servidor.
                 </div>
-                <p style="margin-top: 12px; color: #999; font-size: 0.85em; text-align: center;">
-                    🔒 Procesamiento local - No guardamos tus imágenes
+                <div class="tip" style="margin-top: 10px; background: #fff3cd; border-left-color: #856404;">
+                    <strong>📱 Móviles:</strong> En dispositivos móviles la carga inicial puede tardar hasta 30 segundos. Ten paciencia, ¡vale la pena!
+                </div>
+                <p style="margin-top: 15px; color: #999; font-size: 0.85em; text-align: center;">
+                    🔒 100% privado - Procesamiento local - No guardamos tus imágenes
                 </p>
             </div>
         </div>
     </div>
 
+    <!-- TensorFlow.js y Face Landmarks Detection -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.2"></script>
+
     <script>
         let video, canvas, ctx;
+        let model;
         let currentGlasses = 'wayfarer';
         let stream;
         let isDetecting = false;
         let animationId;
 
-        // Configuración inicial
         document.getElementById('startBtn').addEventListener('click', initCamera);
 
         async function initCamera() {
             const statusDiv = document.getElementById('status');
             const cameraContainer = document.getElementById('cameraContainer');
-            const controls = document.getElementById('controls');
             const glassesSelector = document.getElementById('glassesSelector');
             const startBtn = document.getElementById('startBtn');
 
             try {
                 startBtn.disabled = true;
-                startBtn.textContent = '⏳ Iniciando...';
+                startBtn.innerHTML = '⏳ Iniciando...';
                 
                 statusDiv.className = 'status loading';
-                statusDiv.textContent = '🔄 Activando cámara...';
+                statusDiv.innerHTML = '🔄 Solicitando acceso a la cámara...<br><small>Haz clic en "Permitir" cuando te lo pida</small>';
 
                 // Detectar si es móvil
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-                // Configuración optimizada para móvil
+                // Solicitar cámara
                 const constraints = {
                     video: {
                         facingMode: 'user',
@@ -328,7 +339,6 @@
                     audio: false
                 };
 
-                // Solicitar acceso a la cámara
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
 
                 video = document.getElementById('webcam');
@@ -337,119 +347,137 @@
 
                 video.srcObject = stream;
                 
-                // Esperar a que el video esté listo
                 await new Promise((resolve, reject) => {
                     video.onloadedmetadata = () => {
                         video.play().then(() => {
-                            // Ajustar canvas al tamaño del video
                             canvas.width = video.videoWidth;
                             canvas.height = video.videoHeight;
                             resolve();
                         }).catch(reject);
                     };
-                    
-                    video.onerror = () => {
-                        reject(new Error('Error al cargar el video'));
-                    };
-
-                    // Timeout de seguridad
-                    setTimeout(() => reject(new Error('Timeout al cargar video')), 10000);
+                    video.onerror = reject;
+                    setTimeout(() => reject(new Error('Timeout cargando video')), 10000);
                 });
 
+                statusDiv.className = 'status loading';
+                statusDiv.innerHTML = '🤖 Cargando modelo de Inteligencia Artificial...<br><div class="loading-spinner"></div><br><small>Esto puede tardar 10-30 segundos dependiendo de tu dispositivo.<br>Por favor, espera...</small>';
+
+                // Cargar modelo de detección facial
+                await tf.ready();
+                model = await faceLandmarksDetection.load(
+                    faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+                    { maxFaces: 1 }
+                );
+
                 statusDiv.className = 'status ready';
-                statusDiv.textContent = '✅ ¡Listo! Selecciona un modelo de gafas';
+                statusDiv.innerHTML = '✅ <strong>¡Sistema listo!</strong><br>Mira a la cámara y las gafas se colocarán automáticamente en tu rostro';
 
                 cameraContainer.style.display = 'block';
                 startBtn.style.display = 'none';
                 document.getElementById('captureBtn').style.display = 'inline-block';
                 glassesSelector.style.display = 'grid';
 
-                // Iniciar detección simplificada
+                // Iniciar detección
                 isDetecting = true;
-                detectAndDraw();
+                detectFace();
 
             } catch (error) {
                 console.error('Error completo:', error);
                 statusDiv.className = 'status error';
                 
-                let errorMessage = '❌ <strong>Error al iniciar la cámara</strong><br><br>';
+                let errorHTML = '❌ <strong>Error al iniciar</strong><br><br>';
                 
                 if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-                    errorMessage += 'Has denegado el acceso a la cámara.<br><br>';
-                    errorMessage += '💡 <strong>Solución:</strong><br>';
-                    errorMessage += '1. Busca el icono 🎥 en la barra de direcciones<br>';
-                    errorMessage += '2. Haz clic y selecciona "Permitir"<br>';
-                    errorMessage += '3. Recarga la página';
-                } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-                    errorMessage += 'No se encontró ninguna cámara en tu dispositivo.<br><br>';
-                    errorMessage += 'Verifica que tu cámara esté conectada y habilitada.';
-                } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
-                    errorMessage += 'La cámara está siendo usada por otra aplicación.<br><br>';
-                    errorMessage += 'Cierra otras apps que puedan estar usando la cámara e intenta de nuevo.';
+                    errorHTML += '📷 <strong>Acceso denegado a la cámara</strong><br><br>';
+                    errorHTML += '<strong>Solución:</strong><br>';
+                    errorHTML += '1. Busca el icono 🎥 en la barra de direcciones<br>';
+                    errorHTML += '2. Haz clic y selecciona "Permitir"<br>';
+                    errorHTML += '3. Recarga la página o haz clic en Reintentar';
+                } else if (error.name === 'NotFoundError') {
+                    errorHTML += '📷 <strong>No se encontró cámara</strong><br><br>';
+                    errorHTML += 'Verifica que tu dispositivo tenga una cámara web conectada.';
+                } else if (error.name === 'NotReadableError') {
+                    errorHTML += '📷 <strong>Cámara en uso</strong><br><br>';
+                    errorHTML += 'Cierra otras aplicaciones que puedan estar usando la cámara.';
                 } else {
-                    errorMessage += error.message || 'Error desconocido';
-                    errorMessage += '<br><br>Intenta:<br>';
-                    errorMessage += '• Usar otro navegador (Chrome o Safari)<br>';
-                    errorMessage += '• Dar permisos de cámara en ajustes<br>';
-                    errorMessage += '• Reiniciar el navegador';
+                    errorHTML += '⚠️ ' + (error.message || 'Error desconocido') + '<br><br>';
+                    errorHTML += '<strong>Intenta:</strong><br>';
+                    errorHTML += '• Usar Chrome o Safari<br>';
+                    errorHTML += '• Dar permisos de cámara en configuración<br>';
+                    errorHTML += '• Reiniciar el navegador';
                 }
                 
-                statusDiv.innerHTML = errorMessage;
+                statusDiv.innerHTML = errorHTML;
                 
                 startBtn.disabled = false;
-                startBtn.textContent = '🔄 Reintentar';
+                startBtn.innerHTML = '🔄 Reintentar';
                 startBtn.style.display = 'inline-block';
             }
         }
 
-        function detectAndDraw() {
-            if (!isDetecting || !video || video.paused || video.ended) {
+        async function detectFace() {
+            if (!isDetecting || !model || !video || video.paused || video.ended) {
                 return;
             }
 
             try {
-                // Limpiar canvas
+                const predictions = await model.estimateFaces({
+                    input: video,
+                    returnTensors: false,
+                    flipHorizontal: false,
+                    predictIrises: false
+                });
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Método simplificado: posicionar gafas en el centro superior
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height * 0.35; // 35% desde arriba
-                
-                // Tamaño proporcional al ancho del canvas
-                const glassesWidth = canvas.width * 0.6;
-                const lensRadius = glassesWidth * 0.2;
-
-                // Dibujar gafas
-                drawSimpleGlasses(centerX, centerY, lensRadius);
-
+                if (predictions.length > 0) {
+                    const keypoints = predictions[0].scaledMesh;
+                    drawGlasses(keypoints);
+                }
             } catch (error) {
                 console.error('Error en detección:', error);
             }
 
-            animationId = requestAnimationFrame(detectAndDraw);
+            animationId = requestAnimationFrame(detectFace);
         }
 
-        function drawSimpleGlasses(centerX, centerY, lensRadius) {
+        function drawGlasses(keypoints) {
+            // Puntos clave faciales para ojos
+            const leftEyeOuter = keypoints[33];
+            const leftEyeInner = keypoints[133];
+            const rightEyeInner = keypoints[362];
+            const rightEyeOuter = keypoints[263];
+
+            // Calcular centros de ojos
+            const leftEyeCenter = [
+                (leftEyeOuter[0] + leftEyeInner[0]) / 2,
+                (leftEyeOuter[1] + leftEyeInner[1]) / 2
+            ];
+
+            const rightEyeCenter = [
+                (rightEyeOuter[0] + rightEyeInner[0]) / 2,
+                (rightEyeOuter[1] + rightEyeInner[1]) / 2
+            ];
+
+            // Calcular distancia entre ojos
+            const eyeDistance = Math.sqrt(
+                Math.pow(rightEyeCenter[0] - leftEyeCenter[0], 2) + 
+                Math.pow(rightEyeCenter[1] - leftEyeCenter[1], 2)
+            );
+
+            const lensRadius = eyeDistance * 0.35;
             const style = getGlassesStyle(currentGlasses);
-            const eyeDistance = lensRadius * 2.5;
             
             ctx.strokeStyle = style.color;
             ctx.lineWidth = 4;
             ctx.fillStyle = style.lensColor;
 
-            // Posiciones de los ojos
-            const leftEyeX = centerX - eyeDistance / 2;
-            const rightEyeX = centerX + eyeDistance / 2;
-            const eyeY = centerY;
-
             // Lente izquierda
             ctx.beginPath();
             if (style.shape === 'round') {
-                ctx.arc(leftEyeX, eyeY, lensRadius, 0, 2 * Math.PI);
+                ctx.arc(leftEyeCenter[0], leftEyeCenter[1], lensRadius, 0, 2 * Math.PI);
             } else {
-                const w = lensRadius * 1.2;
-                const h = lensRadius * 0.85;
-                ctx.ellipse(leftEyeX, eyeY, w, h, 0, 0, 2 * Math.PI);
+                ctx.ellipse(leftEyeCenter[0], leftEyeCenter[1], lensRadius * 1.3, lensRadius * 0.9, 0, 0, 2 * Math.PI);
             }
             ctx.fill();
             ctx.stroke();
@@ -457,31 +485,29 @@
             // Lente derecha
             ctx.beginPath();
             if (style.shape === 'round') {
-                ctx.arc(rightEyeX, eyeY, lensRadius, 0, 2 * Math.PI);
+                ctx.arc(rightEyeCenter[0], rightEyeCenter[1], lensRadius, 0, 2 * Math.PI);
             } else {
-                const w = lensRadius * 1.2;
-                const h = lensRadius * 0.85;
-                ctx.ellipse(rightEyeX, eyeY, w, h, 0, 0, 2 * Math.PI);
+                ctx.ellipse(rightEyeCenter[0], rightEyeCenter[1], lensRadius * 1.3, lensRadius * 0.9, 0, 0, 2 * Math.PI);
             }
             ctx.fill();
             ctx.stroke();
 
             // Puente
             ctx.beginPath();
-            ctx.moveTo(leftEyeX + lensRadius * 0.7, eyeY);
-            ctx.lineTo(rightEyeX - lensRadius * 0.7, eyeY);
+            ctx.moveTo(leftEyeCenter[0] + lensRadius * 0.8, leftEyeCenter[1]);
+            ctx.lineTo(rightEyeCenter[0] - lensRadius * 0.8, rightEyeCenter[1]);
             ctx.stroke();
 
             // Patilla izquierda
             ctx.beginPath();
-            ctx.moveTo(leftEyeX - lensRadius * 0.9, eyeY);
-            ctx.lineTo(leftEyeX - lensRadius * 1.6, eyeY + lensRadius * 0.3);
+            ctx.moveTo(leftEyeCenter[0] - lensRadius * 1.1, leftEyeCenter[1]);
+            ctx.lineTo(leftEyeCenter[0] - lensRadius * 1.8, leftEyeCenter[1] + lensRadius * 0.3);
             ctx.stroke();
 
             // Patilla derecha
             ctx.beginPath();
-            ctx.moveTo(rightEyeX + lensRadius * 0.9, eyeY);
-            ctx.lineTo(rightEyeX + lensRadius * 1.6, eyeY + lensRadius * 0.3);
+            ctx.moveTo(rightEyeCenter[0] + lensRadius * 1.1, rightEyeCenter[1]);
+            ctx.lineTo(rightEyeCenter[0] + lensRadius * 1.8, rightEyeCenter[1] + lensRadius * 0.3);
             ctx.stroke();
         }
 
@@ -528,13 +554,9 @@
                 captureCanvas.height = video.videoHeight;
                 const captureCtx = captureCanvas.getContext('2d');
 
-                // Dibujar video
                 captureCtx.drawImage(video, 0, 0);
-                
-                // Dibujar overlay de gafas
                 captureCtx.drawImage(canvas, 0, 0);
 
-                // Descargar
                 captureCanvas.toBlob(blob => {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -547,10 +569,10 @@
 
                     const statusDiv = document.getElementById('status');
                     statusDiv.className = 'status ready';
-                    statusDiv.textContent = '📸 ¡Foto capturada y descargada!';
+                    statusDiv.innerHTML = '📸 <strong>¡Foto capturada!</strong><br>Se está descargando...';
                     
                     setTimeout(() => {
-                        statusDiv.textContent = '✅ ¡Listo! Selecciona un modelo de gafas';
+                        statusDiv.innerHTML = '✅ <strong>¡Sistema listo!</strong><br>Sigue probando diferentes modelos';
                     }, 3000);
                 }, 'image/jpeg', 0.95);
 
@@ -573,5 +595,3 @@
     </script>
 </body>
 </html>
-```
-
