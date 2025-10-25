@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Prueba Virtual AR - Óptica Villa del Mar</title>
+    <title>Prueba Virtual AR Ultra HD - Óptica Villa del Mar</title>
     <style>
         * {
             margin: 0;
@@ -51,6 +51,12 @@
             font-weight: bold;
             font-size: 0.8em;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .main-content {
@@ -88,12 +94,13 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             color: white;
-            padding: 8px 12px;
+            padding: 8px 15px;
             border-radius: 20px;
             font-size: 0.85em;
             display: none;
+            backdrop-filter: blur(10px);
         }
 
         .detection-indicator.active {
@@ -101,7 +108,7 @@
         }
 
         .detection-indicator.good {
-            background: rgba(40, 167, 69, 0.9);
+            background: rgba(40, 167, 69, 0.95);
         }
 
         .controls {
@@ -141,13 +148,20 @@
             border: 2px solid #0066CC;
         }
 
+        .btn-secondary:hover {
+            background: #0066CC;
+            color: white;
+            transform: translateY(-2px);
+        }
+
         .size-control {
             max-width: 600px;
             margin: 20px auto;
             padding: 20px;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             border-radius: 15px;
             display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .size-control.active {
@@ -155,8 +169,9 @@
         }
 
         .size-control h4 {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             color: #333;
+            text-align: center;
         }
 
         .slider-container {
@@ -165,37 +180,46 @@
             gap: 15px;
         }
 
+        .slider-icon {
+            font-size: 1.2em;
+        }
+
         .slider {
             flex: 1;
-            height: 6px;
-            border-radius: 3px;
-            background: #ddd;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #0066CC, #00aaff);
             outline: none;
             -webkit-appearance: none;
         }
 
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: #0066CC;
+            background: white;
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border: 3px solid #0066CC;
         }
 
         .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: #0066CC;
+            background: white;
             cursor: pointer;
-            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border: 3px solid #0066CC;
         }
 
         .slider-value {
             font-weight: bold;
             color: #0066CC;
-            min-width: 40px;
+            min-width: 50px;
+            text-align: center;
+            font-size: 1.1em;
         }
 
         .glasses-selector {
@@ -211,46 +235,73 @@
             border: 3px solid #ddd;
             border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             background: white;
             text-align: center;
             position: relative;
+            overflow: hidden;
+        }
+
+        .glass-option::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0,102,204,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+
+        .glass-option:hover::before {
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
         }
 
         .glass-option:hover {
             border-color: #0066CC;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,102,204,0.3);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,102,204,0.3);
         }
 
         .glass-option.active {
             border-color: #0066CC;
             background: linear-gradient(135deg, #e6f2ff, #cce5ff);
             font-weight: bold;
-            box-shadow: 0 10px 25px rgba(0,102,204,0.4);
+            box-shadow: 0 10px 30px rgba(0,102,204,0.4);
+            transform: scale(1.05);
         }
 
         .glass-preview {
-            width: 80px;
-            height: 40px;
-            margin: 0 auto 10px;
-            position: relative;
+            width: 100px;
+            height: 50px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .glass-name {
             font-weight: bold;
-            margin: 5px 0;
+            margin: 8px 0;
             color: #333;
+            font-size: 1em;
         }
 
         .glass-price {
             color: #28a745;
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: bold;
+            margin: 5px 0;
         }
 
         .glass-details {
-            font-size: 0.8em;
+            font-size: 0.85em;
             color: #666;
             margin-top: 5px;
         }
@@ -285,6 +336,12 @@
             color: #0066CC;
             text-decoration: none;
             font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            color: #0052a3;
+            transform: translateX(-5px);
         }
 
         .loading-spinner {
@@ -300,6 +357,31 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .tips-box {
+            background: linear-gradient(135deg, #e7f3ff, #d4e8ff);
+            border-left: 5px solid #0066CC;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .tips-box h4 {
+            color: #0066CC;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .tips-box ul {
+            margin-left: 20px;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .tips-box li {
+            margin: 8px 0;
         }
 
         @media (min-width: 768px) {
@@ -323,14 +405,14 @@
         <div class="header">
             <span class="pro-badge">✨ ULTRA HD</span>
             <h1>🎥 Prueba Virtual AR</h1>
-            <p>Gafas realistas con detalles profesionales</p>
+            <p>Gafas realistas de alta definición</p>
         </div>
 
         <div class="main-content">
             <a href="index.html" class="back-link">← Volver al catálogo</a>
 
             <div class="status loading" id="status">
-                👋 Haz clic en "Activar Cámara" para comenzar
+                👋 Haz clic en "Activar Cámara" para comenzar la experiencia
             </div>
 
             <div class="camera-container" id="cameraContainer" style="display: none;">
@@ -343,15 +425,15 @@
 
             <div class="controls">
                 <button class="btn btn-primary" id="startBtn">🎥 Activar Cámara</button>
-                <button class="btn btn-secondary" id="captureBtn" style="display: none;">📸 Capturar Foto</button>
+                <button class="btn btn-secondary" id="captureBtn" style="display: none;">📸 Capturar Foto HD</button>
             </div>
 
             <div class="size-control" id="sizeControl">
-                <h4>🔍 Ajustar tamaño de gafas</h4>
+                <h4>🔍 Ajustar Tamaño de las Gafas</h4>
                 <div class="slider-container">
-                    <span>−</span>
-                    <input type="range" min="70" max="130" value="100" class="slider" id="sizeSlider">
-                    <span>+</span>
+                    <span class="slider-icon">👓</span>
+                    <input type="range" min="70" max="150" value="100" class="slider" id="sizeSlider">
+                    <span class="slider-icon">👓</span>
                     <span class="slider-value" id="sizeValue">100%</span>
                 </div>
             </div>
@@ -359,57 +441,89 @@
             <div class="glasses-selector" id="glassesSelector" style="display: none;">
                 <div class="glass-option active" data-model="wayfarer">
                     <div class="glass-preview">
-                        <svg width="80" height="40" viewBox="0 0 80 40">
-                            <rect x="5" y="10" width="30" height="20" rx="2" fill="#000" stroke="#333" stroke-width="2"/>
-                            <rect x="45" y="10" width="30" height="20" rx="2" fill="#000" stroke="#333" stroke-width="2"/>
-                            <line x1="35" y1="20" x2="45" y2="20" stroke="#000" stroke-width="2"/>
+                        <svg width="100" height="50" viewBox="0 0 100 50">
+                            <!-- Wayfarer más grandes y realistas -->
+                            <defs>
+                                <linearGradient id="wayfarerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="5" y="12" width="35" height="26" rx="3" fill="url(#wayfarerGrad)" stroke="#000" stroke-width="2.5"/>
+                            <rect x="60" y="12" width="35" height="26" rx="3" fill="url(#wayfarerGrad)" stroke="#000" stroke-width="2.5"/>
+                            <line x1="40" y1="25" x2="60" y2="25" stroke="#000" stroke-width="2.5"/>
+                            <text x="22" y="28" font-size="4" fill="white" font-weight="bold">RB</text>
                         </svg>
                     </div>
                     <div class="glass-name">Ray-Ban Wayfarer</div>
                     <div class="glass-price">155€</div>
-                    <div class="glass-details">Acetato negro mate</div>
+                    <div class="glass-details">Acetato negro clásico</div>
                 </div>
 
                 <div class="glass-option" data-model="hawkers">
                     <div class="glass-preview">
-                        <svg width="80" height="40" viewBox="0 0 80 40">
-                            <rect x="5" y="12" width="28" height="18" rx="1" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
-                            <rect x="47" y="12" width="28" height="18" rx="1" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
-                            <line x1="33" y1="21" x2="47" y2="21" stroke="#1a1a1a" stroke-width="1.5"/>
+                        <svg width="100" height="50" viewBox="0 0 100 50">
+                            <defs>
+                                <linearGradient id="hawkersGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#2a2a2a;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="8" y="14" width="32" height="22" rx="2" fill="url(#hawkersGrad)" stroke="#1a1a1a" stroke-width="2"/>
+                            <rect x="60" y="14" width="32" height="22" rx="2" fill="url(#hawkersGrad)" stroke="#1a1a1a" stroke-width="2"/>
+                            <line x1="40" y1="25" x2="60" y2="25" stroke="#1a1a1a" stroke-width="2"/>
                         </svg>
                     </div>
                     <div class="glass-name">Hawkers Carbono</div>
                     <div class="glass-price">35€</div>
-                    <div class="glass-details">TR90 deportivo</div>
+                    <div class="glass-details">TR90 deportivo negro</div>
                 </div>
 
                 <div class="glass-option" data-model="clubmaster">
                     <div class="glass-preview">
-                        <svg width="80" height="40" viewBox="0 0 80 40">
-                            <ellipse cx="20" cy="20" rx="15" ry="12" fill="rgba(139,69,19,0.2)" stroke="#8B4513" stroke-width="2"/>
-                            <ellipse cx="60" cy="20" rx="15" ry="12" fill="rgba(139,69,19,0.2)" stroke="#8B4513" stroke-width="2"/>
-                            <path d="M5 15 Q20 12 35 15" stroke="#8B4513" stroke-width="3" fill="none"/>
-                            <path d="M45 15 Q60 12 75 15" stroke="#8B4513" stroke-width="3" fill="none"/>
-                            <line x1="35" y1="20" x2="45" y2="20" stroke="#C0C0C0" stroke-width="1.5"/>
+                        <svg width="100" height="50" viewBox="0 0 100 50">
+                            <ellipse cx="25" cy="25" rx="18" ry="15" fill="rgba(139,69,19,0.15)" stroke="#DAA520" stroke-width="1.5"/>
+                            <ellipse cx="75" cy="25" rx="18" ry="15" fill="rgba(139,69,19,0.15)" stroke="#DAA520" stroke-width="1.5"/>
+                            <path d="M7 20 Q25 15 43 20" stroke="#8B4513" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            <path d="M57 20 Q75 15 93 20" stroke="#8B4513" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            <line x1="43" y1="25" x2="57" y2="25" stroke="#C0C0C0" stroke-width="1.5"/>
                         </svg>
                     </div>
                     <div class="glass-name">Ray-Ban Clubmaster</div>
                     <div class="glass-price">165€</div>
-                    <div class="glass-details">Acetato + metal</div>
+                    <div class="glass-details">Retro acetato + metal</div>
                 </div>
 
                 <div class="glass-option" data-model="aviator">
                     <div class="glass-preview">
-                        <svg width="80" height="40" viewBox="0 0 80 40">
-                            <ellipse cx="20" cy="20" rx="16" ry="14" fill="rgba(200,200,200,0.2)" stroke="#C0C0C0" stroke-width="1.5"/>
-                            <ellipse cx="60" cy="20" rx="16" ry="14" fill="rgba(200,200,200,0.2)" stroke="#C0C0C0" stroke-width="1.5"/>
-                            <line x1="36" y1="20" x2="44" y2="20" stroke="#C0C0C0" stroke-width="1.5"/>
+                        <svg width="100" height="50" viewBox="0 0 100 50">
+                            <defs>
+                                <radialGradient id="aviatorGrad">
+                                    <stop offset="0%" style="stop-color:#9BC995;stop-opacity:0.4" />
+                                    <stop offset="100%" style="stop-color:#5A6B54;stop-opacity:0.6" />
+                                </radialGradient>
+                            </defs>
+                            <ellipse cx="25" cy="25" rx="19" ry="17" fill="url(#aviatorGrad)" stroke="#DAA520" stroke-width="2"/>
+                            <ellipse cx="75" cy="25" rx="19" ry="17" fill="url(#aviatorGrad)" stroke="#DAA520" stroke-width="2"/>
+                            <line x1="44" y1="25" x2="56" y2="25" stroke="#DAA520" stroke-width="2"/>
+                            <line x1="44" y1="22" x2="56" y2="22" stroke="#DAA520" stroke-width="1.5"/>
                         </svg>
                     </div>
                     <div class="glass-name">Ray-Ban Aviator</div>
                     <div class="glass-price">165€</div>
-                    <div class="glass-details">Metal dorado</div>
+                    <div class="glass-details">Metal dorado clásico</div>
                 </div>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Consejos para la Mejor Experiencia:</h4>
+                <ul>
+                    <li>✅ <strong>Iluminación:</strong> Colócate frente a una ventana o luz frontal</li>
+                    <li>✅ <strong>Posición:</strong> Mantén tu rostro centrado y a 50-70cm de la cámara</li>
+                    <li>✅ <strong>Tamaño:</strong> Usa el deslizador si las gafas son muy grandes o pequeñas</li>
+                    <li>✅ <strong>Movimiento:</strong> Gira suavemente la cabeza para ver diferentes ángulos</li>
+                    <li>✅ <strong>Prueba todos:</strong> Compara los 4 modelos antes de decidir</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -426,12 +540,12 @@
         let animationId;
         let glassesSize = 1.0;
         
-        // Estabilización mejorada
+        // Suavizado ultra mejorado
         let smoothedEyePositions = {
             left: null,
             right: null
         };
-        const smoothingFactor = 0.75; // Mayor = más suave
+        const smoothingFactor = 0.8; // Muy suave
 
         document.getElementById('startBtn').addEventListener('click', initCamera);
         document.getElementById('sizeSlider').addEventListener('input', updateGlassesSize);
@@ -453,7 +567,7 @@
                 startBtn.innerHTML = '⏳ Iniciando...';
                 
                 statusDiv.className = 'status loading';
-                statusDiv.innerHTML = '🔄 Activando cámara...<br><small>Permite el acceso cuando te lo pida</small>';
+                statusDiv.innerHTML = '🔄 Activando cámara HD...<br><small>Permite el acceso cuando aparezca la solicitud</small>';
 
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -485,12 +599,12 @@
                 });
 
                 statusDiv.className = 'status loading';
-                statusDiv.innerHTML = '🤖 Cargando IA...<br><div class="loading-spinner"></div>';
+                statusDiv.innerHTML = '🤖 Cargando motor de IA...<br><div class="loading-spinner"></div><br><small>Preparando detección facial avanzada...</small>';
 
                 model = await blazeface.load();
 
                 statusDiv.className = 'status ready';
-                statusDiv.innerHTML = '✅ <strong>¡Listo!</strong> Ajusta el tamaño con el deslizador si es necesario';
+                statusDiv.innerHTML = '✅ <strong>¡Sistema iniciado!</strong><br>Ajusta el tamaño de las gafas con el deslizador si es necesario';
 
                 cameraContainer.style.display = 'block';
                 startBtn.style.display = 'none';
@@ -505,7 +619,7 @@
             } catch (error) {
                 console.error('Error:', error);
                 statusDiv.className = 'status error';
-                statusDiv.innerHTML = '❌ Error al iniciar. Por favor, recarga la página.';
+                statusDiv.innerHTML = '❌ <strong>Error al iniciar la cámara</strong><br><br>Por favor, permite el acceso y recarga la página.';
                 startBtn.disabled = false;
                 startBtn.innerHTML = '🔄 Reintentar';
             }
@@ -521,8 +635,8 @@
                 const indicator = document.getElementById('detectionIndicator');
 
                 if (predictions.length > 0) {
-                    drawRealisticGlasses(predictions[0]);
-                    indicator.textContent = '✅ Perfecto';
+                    drawUltraRealisticGlasses(predictions[0]);
+                    indicator.textContent = '✅ Detección perfecta';
                     indicator.className = 'detection-indicator active good';
                 } else {
                     indicator.textContent = '⚠️ Busca tu rostro';
@@ -543,12 +657,12 @@
             ];
         }
 
-        function drawRealisticGlasses(face) {
+        function drawUltraRealisticGlasses(face) {
             const landmarks = face.landmarks;
             const rightEye = landmarks[0];
             const leftEye = landmarks[1];
 
-            // Suavizado
+            // Suavizado mejorado
             smoothedEyePositions.right = smoothEyePosition(rightEye, smoothedEyePositions.right);
             smoothedEyePositions.left = smoothEyePosition(leftEye, smoothedEyePositions.left);
 
@@ -556,305 +670,336 @@
             const le = smoothedEyePositions.left;
 
             const eyeDistance = Math.sqrt(Math.pow(le[0] - re[0], 2) + Math.pow(le[1] - re[1], 2));
-            const angle = Math.atan2(le[1] - re[1], le[0] - re[0]);
 
             ctx.save();
 
-            // Dibujar según el modelo
+            // Dibujar según el modelo seleccionado
             switch(currentGlasses) {
                 case 'wayfarer':
-                    drawWayfarer(re, le, eyeDistance, angle);
+                    drawWayfarerUltraHD(re, le, eyeDistance);
                     break;
                 case 'hawkers':
-                    drawHawkers(re, le, eyeDistance, angle);
+                    drawHawkersUltraHD(re, le, eyeDistance);
                     break;
                 case 'clubmaster':
-                    drawClubmaster(re, le, eyeDistance, angle);
+                    drawClubmasterUltraHD(re, le, eyeDistance);
                     break;
                 case 'aviator':
-                    drawAviator(re, le, eyeDistance, angle);
+                    drawAviatorUltraHD(re, le, eyeDistance);
                     break;
             }
 
             ctx.restore();
         }
 
-        function drawWayfarer(re, le, distance, angle) {
-            const size = distance * 0.38 * glassesSize;
-            const thickness = 6;
+        function drawWayfarerUltraHD(re, le, distance) {
+            // Wayfarer MÁS GRANDES y realistas
+            const baseSize = distance * 0.50 * glassesSize; // Aumentado de 0.38 a 0.50
+            const lensWidth = baseSize * 1.4;
+            const lensHeight = baseSize * 1.1;
+            const frameThickness = 7;
 
-            // Sombra
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetY = 3;
+            // Sombra principal
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 5;
 
-            // Marco negro brillante
-            ctx.fillStyle = '#000000';
-            ctx.strokeStyle = '#1a1a1a';
-            ctx.lineWidth = thickness;
+            // Marco de acetato negro brillante
+            ctx.fillStyle = '#0a0a0a';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = frameThickness;
 
-            // Lente derecha - rectangular redondeada
-            drawRoundedRect(re[0] - size * 0.6, re[1] - size * 0.5, size * 1.2, size, size * 0.15);
+            // Lente derecha - forma Wayfarer característica
+            drawWayfarerLens(re[0] - lensWidth * 0.5, re[1] - lensHeight * 0.5, lensWidth, lensHeight, baseSize * 0.15);
             
             // Lente izquierda
-            drawRoundedRect(le[0] - size * 0.6, le[1] - size * 0.5, size * 1.2, size, size * 0.15);
+            drawWayfarerLens(le[0] - lensWidth * 0.5, le[1] - lensHeight * 0.5, lensWidth, lensHeight, baseSize * 0.15);
 
-            // Cristales oscuros con gradiente
-            const gradient1 = ctx.createLinearGradient(re[0], re[1] - size * 0.5, re[0], re[1] + size * 0.5);
-            gradient1.addColorStop(0, 'rgba(20, 20, 20, 0.85)');
-            gradient1.addColorStop(1, 'rgba(10, 10, 10, 0.75)');
+            // Cristales oscuros con gradiente realista
+            ctx.shadowColor = 'transparent';
+            
+            const gradient1 = ctx.createLinearGradient(
+                re[0], re[1] - lensHeight * 0.5,
+                re[0], re[1] + lensHeight * 0.5
+            );
+            gradient1.addColorStop(0, 'rgba(30, 30, 30, 0.9)');
+            gradient1.addColorStop(0.5, 'rgba(15, 15, 15, 0.85)');
+            gradient1.addColorStop(1, 'rgba(20, 20, 20, 0.88)');
             
             ctx.fillStyle = gradient1;
-            drawRoundedRect(re[0] - size * 0.55, re[1] - size * 0.45, size * 1.1, size * 0.9, size * 0.12, true);
-            drawRoundedRect(le[0] - size * 0.55, le[1] - size * 0.45, size * 1.1, size * 0.9, size * 0.12, true);
+            drawWayfarerLens(re[0] - lensWidth * 0.45, re[1] - lensHeight * 0.45, lensWidth * 0.9, lensHeight * 0.9, baseSize * 0.12, true);
+            drawWayfarerLens(le[0] - lensWidth * 0.45, le[1] - lensHeight * 0.45, lensWidth * 0.9, lensHeight * 0.9, baseSize * 0.12, true);
 
-            // Reflejos realistas
-            ctx.shadowColor = 'transparent';
-            const refGrad = ctx.createRadialGradient(re[0] - size * 0.25, re[1] - size * 0.25, 0, re[0] - size * 0.25, re[1] - size * 0.25, size * 0.4);
-            refGrad.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-            refGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            
-            ctx.fillStyle = refGrad;
-            ctx.beginPath();
-            ctx.arc(re[0] - size * 0.25, re[1] - size * 0.25, size * 0.4, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(le[0] - size * 0.25, le[1] - size * 0.25, size * 0.4, 0, 2 * Math.PI);
-            ctx.fill();
+            // Reflejos ultra realistas
+            drawReflection(re[0] - baseSize * 0.3, re[1] - baseSize * 0.35, baseSize * 0.5, 0.5);
+            drawReflection(le[0] - baseSize * 0.3, le[1] - baseSize * 0.35, baseSize * 0.5, 0.5);
 
-            // Puente
+            // Brillo en el marco
+            const frameGrad = ctx.createLinearGradient(re[0], re[1] - lensHeight * 0.5, re[0], re[1] - lensHeight * 0.3);
+            frameGrad.addColorStop(0, 'rgba(100, 100, 100, 0.3)');
+            frameGrad.addColorStop(1, 'rgba(100, 100, 100, 0)');
+            ctx.fillStyle = frameGrad;
+            ctx.fillRect(re[0] - lensWidth * 0.5, re[1] - lensHeight * 0.5, lensWidth, lensHeight * 0.3);
+            ctx.fillRect(le[0] - lensWidth * 0.5, le[1] - lensHeight * 0.5, lensWidth, lensHeight * 0.3);
+
+            // Puente robusto
             ctx.strokeStyle = '#000000';
-            ctx.lineWidth = thickness;
+            ctx.lineWidth = frameThickness;
+            ctx.lineCap = 'round';
             ctx.beginPath();
-            ctx.moveTo(re[0] + size * 0.6, re[1]);
-            ctx.lineTo(le[0] - size * 0.6, le[1]);
+            ctx.moveTo(re[0] + lensWidth * 0.5, re[1]);
+            ctx.lineTo(le[0] - lensWidth * 0.5, le[1]);
             ctx.stroke();
 
-            // Patillas con detalle
-            ctx.lineWidth = thickness - 1;
+            // Patillas gruesas
+            ctx.lineWidth = frameThickness;
             ctx.beginPath();
-            ctx.moveTo(re[0] - size * 0.6, re[1]);
-            ctx.lineTo(re[0] - size * 1.3, re[1] + size * 0.15);
+            ctx.moveTo(re[0] - lensWidth * 0.5, re[1]);
+            ctx.lineTo(re[0] - lensWidth * 0.5 - baseSize * 0.8, re[1] + baseSize * 0.2);
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.moveTo(le[0] + size * 0.6, le[1]);
-            ctx.lineTo(le[0] + size * 1.3, le[1] + size * 0.15);
+            ctx.moveTo(le[0] + lensWidth * 0.5, le[1]);
+            ctx.lineTo(le[0] + lensWidth * 0.5 + baseSize * 0.8, le[1] + baseSize * 0.2);
             ctx.stroke();
 
-            // Logo Ray-Ban (simulado)
-            ctx.fillStyle = '#ffffff';
-            ctx.font = `${size * 0.15}px Arial`;
-            ctx.fillText('RB', re[0] + size * 0.15, re[1]);
+            // Logo Ray-Ban
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = `bold ${baseSize * 0.15}px Arial`;
+            ctx.fillText('RB', re[0] + lensWidth * 0.1, re[1] + baseSize * 0.05);
         }
 
-        function drawHawkers(re, le, distance, angle) {
-            const size = distance * 0.36 * glassesSize;
+        function drawWayfarerLens(x, y, width, height, radius, fillOnly = false) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
             
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetY = 2;
+            if (fillOnly) {
+                ctx.fill();
+            } else {
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
 
-            // Marco deportivo negro
+        function drawHawkersUltraHD(re, le, distance) {
+            const baseSize = distance * 0.46 * glassesSize;
+            const lensWidth = baseSize * 1.3;
+            const lensHeight = baseSize * 0.95;
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 12;
+            ctx.shadowOffsetY = 4;
+
+            // Marco deportivo TR90
             ctx.fillStyle = '#1a1a1a';
             ctx.strokeStyle = '#2a2a2a';
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 6;
 
-            drawRoundedRect(re[0] - size * 0.55, re[1] - size * 0.45, size * 1.1, size * 0.9, size * 0.1);
-            drawRoundedRect(le[0] - size * 0.55, le[1] - size * 0.45, size * 1.1, size * 0.9, size * 0.1);
+            drawRoundedRect(re[0] - lensWidth * 0.5, re[1] - lensHeight * 0.5, lensWidth, lensHeight, baseSize * 0.12);
+            drawRoundedRect(le[0] - lensWidth * 0.5, le[1] - lensHeight * 0.5, lensWidth, lensHeight, baseSize * 0.12);
 
             // Cristales polarizados
-            const gradient = ctx.createLinearGradient(re[0], re[1] - size * 0.4, re[0], re[1] + size * 0.4);
-            gradient.addColorStop(0, 'rgba(30, 30, 30, 0.7)');
-            gradient.addColorStop(1, 'rgba(50, 50, 50, 0.6)');
+            const gradient = ctx.createLinearGradient(re[0], re[1] - lensHeight * 0.4, re[0], re[1] + lensHeight * 0.4);
+            gradient.addColorStop(0, 'rgba(40, 40, 40, 0.75)');
+            gradient.addColorStop(1, 'rgba(60, 60, 60, 0.65)');
             
             ctx.fillStyle = gradient;
-            drawRoundedRect(re[0] - size * 0.5, re[1] - size * 0.4, size, size * 0.8, size * 0.08, true);
-            drawRoundedRect(le[0] - size * 0.5, le[1] - size * 0.4, size, size * 0.8, size * 0.08, true);
+            ctx.shadowColor = 'transparent';
+            drawRoundedRect(re[0] - lensWidth * 0.45, re[1] - lensHeight * 0.45, lensWidth * 0.9, lensHeight * 0.9, baseSize * 0.1, true);
+            drawRoundedRect(le[0] - lensWidth * 0.45, le[1] - lensHeight * 0.45, lensWidth * 0.9, lensHeight * 0.9, baseSize * 0.1, true);
+
+            // Reflejos espejados
+            drawReflection(re[0] - baseSize * 0.25, re[1] - baseSize * 0.3, baseSize * 0.45, 0.4);
+            drawReflection(le[0] - baseSize * 0.25, le[1] - baseSize * 0.3, baseSize * 0.45, 0.4);
 
             // Puente deportivo
-            ctx.shadowColor = 'transparent';
             ctx.strokeStyle = '#1a1a1a';
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
             ctx.beginPath();
-            ctx.moveTo(re[0] + size * 0.55, re[1]);
-            ctx.lineTo(le[0] - size * 0.55, le[1]);
+            ctx.moveTo(re[0] + lensWidth * 0.5, re[1]);
+            ctx.lineTo(le[0] - lensWidth * 0.5, le[1]);
             ctx.stroke();
 
             // Patillas
+            ctx.lineWidth = 5;
             ctx.beginPath();
-            ctx.moveTo(re[0] - size * 0.55, re[1]);
-            ctx.lineTo(re[0] - size * 1.2, re[1] + size * 0.1);
+            ctx.moveTo(re[0] - lensWidth * 0.5, re[1]);
+            ctx.lineTo(re[0] - lensWidth * 0.5 - baseSize * 0.75, re[1] + baseSize * 0.15);
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.moveTo(le[0] + size * 0.55, le[1]);
-            ctx.lineTo(le[0] + size * 1.2, le[1] + size * 0.1);
+            ctx.moveTo(le[0] + lensWidth * 0.5, le[1]);
+            ctx.lineTo(le[0] + lensWidth * 0.5 + baseSize * 0.75, le[1] + baseSize * 0.15);
             ctx.stroke();
         }
 
-        function drawClubmaster(re, le, distance, angle) {
-            const size = distance * 0.37 * glassesSize;
+        function drawClubmasterUltraHD(re, le, distance) {
+            const baseSize = distance * 0.48 * glassesSize;
+            const radius = baseSize * 0.7;
             
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-            ctx.shadowBlur = 9;
-            ctx.shadowOffsetY = 3;
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+            ctx.shadowBlur = 13;
+            ctx.shadowOffsetY = 4;
 
             // Barra superior de acetato marrón
-            ctx.fillStyle = '#8B4513';
-            ctx.strokeStyle = '#654321';
-            ctx.lineWidth = 7;
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
             
             ctx.beginPath();
-            ctx.arc(re[0], re[1], size * 0.65, Math.PI * 0.9, Math.PI * 0.1, true);
+            ctx.arc(re[0], re[1], radius, Math.PI * 0.85, Math.PI * 0.15, true);
             ctx.stroke();
             
             ctx.beginPath();
-            ctx.arc(le[0], le[1], size * 0.65, Math.PI * 0.9, Math.PI * 0.1, true);
+            ctx.arc(le[0], le[1], radius, Math.PI * 0.85, Math.PI * 0.15, true);
             ctx.stroke();
 
-            // Aros de metal dorado
+            // Aros metálicos dorados
             ctx.strokeStyle = '#DAA520';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 2.5;
             
             ctx.beginPath();
-            ctx.arc(re[0], re[1], size * 0.6, 0, 2 * Math.PI);
+            ctx.arc(re[0], re[1], radius * 0.92, 0, 2 * Math.PI);
             ctx.stroke();
             
             ctx.beginPath();
-            ctx.arc(le[0], le[1], size * 0.6, 0, 2 * Math.PI);
+            ctx.arc(le[0], le[1], radius * 0.92, 0, 2 * Math.PI);
             ctx.stroke();
 
             // Cristales con tinte
-            const gradient = ctx.createRadialGradient(re[0], re[1], 0, re[0], re[1], size * 0.6);
+            ctx.shadowColor = 'transparent';
+            const gradient = ctx.createRadialGradient(re[0], re[1], 0, re[0], re[1], radius * 0.9);
             gradient.addColorStop(0, 'rgba(139, 69, 19, 0.35)');
-            gradient.addColorStop(1, 'rgba(139, 69, 19, 0.45)');
+            gradient.addColorStop(1, 'rgba(100, 50, 15, 0.5)');
             
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(re[0], re[1], size * 0.58, 0, 2 * Math.PI);
+            ctx.arc(re[0], re[1], radius * 0.88, 0, 2 * Math.PI);
             ctx.fill();
             
             ctx.beginPath();
-            ctx.arc(le[0], le[1], size * 0.58, 0, 2 * Math.PI);
+            ctx.arc(le[0], le[1], radius * 0.88, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Reflejos en cristales
-            ctx.shadowColor = 'transparent';
-            const refGrad = ctx.createRadialGradient(re[0] - size * 0.2, re[1] - size * 0.2, 0, re[0] - size * 0.2, re[1] - size * 0.2, size * 0.35);
-            refGrad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-            refGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            
-            ctx.fillStyle = refGrad;
-            ctx.beginPath();
-            ctx.arc(re[0] - size * 0.2, re[1] - size * 0.2, size * 0.35, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            ctx.beginPath();
-            ctx.arc(le[0] - size * 0.2, le[1] - size * 0.2, size * 0.35, 0, 2 * Math.PI);
-            ctx.fill();
+            // Reflejos
+            drawReflection(re[0] - radius * 0.35, re[1] - radius * 0.35, radius * 0.5, 0.55);
+            drawReflection(le[0] - radius * 0.35, le[1] - radius * 0.35, radius * 0.5, 0.55);
 
             // Puente metálico
             ctx.strokeStyle = '#C0C0C0';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(re[0] + size * 0.6, re[1]);
-            ctx.lineTo(le[0] - size * 0.6, le[1]);
+            ctx.moveTo(re[0] + radius * 0.92, re[1]);
+            ctx.lineTo(le[0] - radius * 0.92, le[1]);
             ctx.stroke();
 
-            // Patillas
+            // Patillas de acetato
             ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 5;
             ctx.beginPath();
-            ctx.moveTo(re[0] - size * 0.6, re[1]);
-            ctx.lineTo(re[0] - size * 1.25, re[1] + size * 0.15);
+            ctx.moveTo(re[0] - radius * 0.92, re[1]);
+            ctx.lineTo(re[0] - radius * 0.92 - baseSize * 0.65, re[1] + baseSize * 0.18);
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.moveTo(le[0] + size * 0.6, le[1]);
-            ctx.lineTo(le[0] + size * 1.25, le[1] + size * 0.15);
+            ctx.moveTo(le[0] + radius * 0.92, le[1]);
+            ctx.lineTo(le[0] + radius * 0.92 + baseSize * 0.65, le[1] + baseSize * 0.18);
             ctx.stroke();
         }
 
-        function drawAviator(re, le, distance, angle) {
-            const size = distance * 0.38 * glassesSize;
+        function drawAviatorUltraHD(re, le, distance) {
+            const baseSize = distance * 0.50 * glassesSize;
+            const radius = baseSize * 0.75;
             
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetY = 4;
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 14;
+            ctx.shadowOffsetY = 5;
 
             // Marco metálico dorado
             ctx.strokeStyle = '#DAA520';
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 3;
             
             ctx.beginPath();
-            ctx.arc(re[0], re[1], size * 0.68, 0, 2 * Math.PI);
+            ctx.arc(re[0], re[1], radius, 0, 2 * Math.PI);
             ctx.stroke();
             
             ctx.beginPath();
-            ctx.arc(le[0], le[1], size * 0.68, 0, 2 * Math.PI);
+            ctx.arc(le[0], le[1], radius, 0, 2 * Math.PI);
             ctx.stroke();
 
-            // Cristales G-15 (verde-marrón)
-            const gradient = ctx.createRadialGradient(re[0], re[1], 0, re[0], re[1], size * 0.68);
-            gradient.addColorStop(0, 'rgba(80, 100, 80, 0.5)');
-            gradient.addColorStop(1, 'rgba(60, 80, 60, 0.6)');
+            // Cristales G-15 (verde-marrón auténtico)
+            ctx.shadowColor = 'transparent';
+            const gradient = ctx.createRadialGradient(re[0], re[1], 0, re[0], re[1], radius);
+            gradient.addColorStop(0, 'rgba(155, 201, 149, 0.45)');
+            gradient.addColorStop(0.5, 'rgba(90, 107, 84, 0.55)');
+            gradient.addColorStop(1, 'rgba(70, 85, 70, 0.65)');
             
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(re[0], re[1], size * 0.66, 0, 2 * Math.PI);
+            ctx.arc(re[0], re[1], radius * 0.96, 0, 2 * Math.PI);
             ctx.fill();
             
             ctx.beginPath();
-            ctx.arc(le[0], le[1], size * 0.66, 0, 2 * Math.PI);
+            ctx.arc(le[0], le[1], radius * 0.96, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Reflejos espejados
-            ctx.shadowColor = 'transparent';
-            const refGrad = ctx.createRadialGradient(re[0] - size * 0.25, re[1] - size * 0.25, 0, re[0] - size * 0.25, re[1] - size * 0.25, size * 0.45);
-            refGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
-            refGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
-            refGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            
-            ctx.fillStyle = refGrad;
-            ctx.beginPath();
-            ctx.arc(re[0] - size * 0.25, re[1] - size * 0.25, size * 0.45, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            ctx.beginPath();
-            ctx.arc(le[0] - size * 0.25, le[1] - size * 0.25, size * 0.45, 0, 2 * Math.PI);
-            ctx.fill();
+            // Reflejos espejados intensos
+            drawReflection(re[0] - radius * 0.4, re[1] - radius * 0.4, radius * 0.6, 0.7);
+            drawReflection(le[0] - radius * 0.4, le[1] - radius * 0.4, radius * 0.6, 0.7);
 
             // Doble puente característico
             ctx.strokeStyle = '#DAA520';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(re[0] + radius, re[1]);
+            ctx.lineTo(le[0] - radius, le[1]);
+            ctx.stroke();
+
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(re[0] + size * 0.68, re[1]);
-            ctx.lineTo(le[0] - size * 0.68, le[1]);
+            ctx.moveTo(re[0] + radius, re[1] - baseSize * 0.1);
+            ctx.lineTo(le[0] - radius, le[1] - baseSize * 0.1);
             ctx.stroke();
 
-            ctx.lineWidth = 1.5;
+            // Patillas metálicas elegantes
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.moveTo(re[0] + size * 0.68, re[1] - size * 0.08);
-            ctx.lineTo(le[0] - size * 0.68, le[1] - size * 0.08);
-            ctx.stroke();
-
-            // Patillas metálicas finas
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(re[0] - size * 0.68, re[1]);
-            ctx.lineTo(re[0] - size * 1.4, re[1] + size * 0.2);
+            ctx.moveTo(re[0] - radius, re[1]);
+            ctx.lineTo(re[0] - radius - baseSize * 0.9, re[1] + baseSize * 0.25);
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.moveTo(le[0] + size * 0.68, le[1]);
-            ctx.lineTo(le[0] + size * 1.4, le[1] + size * 0.2);
+            ctx.moveTo(le[0] + radius, le[1]);
+            ctx.lineTo(le[0] + radius + baseSize * 0.9, le[1] + baseSize * 0.25);
             ctx.stroke();
 
-            // Logo RB
-            ctx.fillStyle = '#DAA520';
-            ctx.font = `bold ${size * 0.12}px Arial`;
-            ctx.fillText('RB', re[0] - size * 0.1, re[1] + size * 0.5);
+            // Logo RB en dorado
+            ctx.fillStyle = 'rgba(218, 165, 32, 0.9)';
+            ctx.font = `bold ${baseSize * 0.13}px Arial`;
+            ctx.fillText('RB', re[0] - baseSize * 0.08, re[1] + radius * 0.6);
+        }
+
+        function drawReflection(x, y, size, intensity) {
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+            gradient.addColorStop(0, `rgba(255, 255, 255, ${intensity})`);
+            gradient.addColorStop(0.4, `rgba(255, 255, 255, ${intensity * 0.4})`);
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, 2 * Math.PI);
+            ctx.fill();
         }
 
         function drawRoundedRect(x, y, width, height, radius, fillOnly = false) {
@@ -878,7 +1023,7 @@
             }
         }
 
-        // Selector de gafas
+        // Selector de gafas con animación
         document.querySelectorAll('.glass-option').forEach(option => {
             option.addEventListener('click', function() {
                 document.querySelectorAll('.glass-option').forEach(o => o.classList.remove('active'));
@@ -887,7 +1032,7 @@
             });
         });
 
-        // Capturar foto
+        // Capturar foto HD
         document.getElementById('captureBtn').addEventListener('click', function() {
             const captureCanvas = document.createElement('canvas');
             captureCanvas.width = video.videoWidth;
@@ -901,7 +1046,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `optica-${currentGlasses}-${Date.now()}.jpg`;
+                a.download = `optica-villa-del-mar-${currentGlasses}-HD-${Date.now()}.jpg`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -909,11 +1054,12 @@
 
                 const statusDiv = document.getElementById('status');
                 statusDiv.className = 'status ready';
-                statusDiv.innerHTML = '📸 ¡Foto guardada!';
+                statusDiv.innerHTML = '📸 <strong>¡Foto HD capturada!</strong><br>Se ha descargado automáticamente';
+                
                 setTimeout(() => {
-                    statusDiv.innerHTML = '✅ ¡Listo! Sigue probando';
-                }, 2000);
-            }, 'image/jpeg', 0.95);
+                    statusDiv.innerHTML = '✅ <strong>¡Sistema iniciado!</strong><br>Sigue probando diferentes modelos';
+                }, 3000);
+            }, 'image/jpeg', 0.98);
         });
 
         window.addEventListener('beforeunload', () => {
